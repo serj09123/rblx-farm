@@ -268,7 +268,17 @@ local function onHatch(player: Player, slot: number)
 		data.pity = Hatchery.nextPity(def, data.pity, outcome.rarity)
 	end
 	data.nests[key] = nil
+	local tierBefore = Progression.tier(data.stats.hatched)
 	data.stats.hatched += 1
+	local tierAfter = Progression.tier(data.stats.hatched)
+	if tierAfter > tierBefore then
+		for _, nestDef in Nests.purchasable do
+			if nestDef.tier == tierAfter then
+				Analytics.progression(player, "NestTier", tierAfter, nestDef.id)
+				Notifier.send(player, "rare", nestDef.displayName .. " unlocked!", "nest")
+			end
+		end
+	end
 	PlotService:refreshBed(player, slot)
 	PlotService:setBedEta(player, slot, nil)
 	SyncService:markDirty(player, "nests", "pity", "stats", "limits")

@@ -335,34 +335,28 @@ check("CreatureVisuals builds every species with every mutation", function()
 	for _, species in Creatures.list do
 		local all = {}
 		for _, m in Mutations.list do
-			local model = CreatureVisuals.build(
-				{
-					id = "x",
-					species = species.id,
-					rarity = species.rarity,
-					mutations = { m.id },
-					size = 1.1,
-					obtainedAt = 0,
-					source = "hatch",
-				},
-				base
-			)
+			local model = CreatureVisuals.build({
+				id = "x",
+				species = species.id,
+				rarity = species.rarity,
+				mutations = { m.id },
+				size = 1.1,
+				obtainedAt = 0,
+				source = "hatch",
+			}, base)
 			assert(model, "no model for " .. species.id)
 			CreatureVisuals.release(model)
 			table.insert(all, m.id)
 		end
-		local model = CreatureVisuals.build(
-			{
-				id = "y",
-				species = species.id,
-				rarity = species.rarity,
-				mutations = { "Frozen", "Electric", "Cosmic" },
-				size = 0.8,
-				obtainedAt = 0,
-				source = "hatch",
-			},
-			base
-		)
+		local model = CreatureVisuals.build({
+			id = "y",
+			species = species.id,
+			rarity = species.rarity,
+			mutations = { "Frozen", "Electric", "Cosmic" },
+			size = 0.8,
+			obtainedAt = 0,
+			source = "hatch",
+		}, base)
 		CreatureVisuals.release(model)
 	end
 	for _, nest in Nests.list do
@@ -418,29 +412,23 @@ Net.Client.invoke = function(name, arg)
 	elseif name == "GetShop" then
 		local passes, products = {}, {}
 		for _, p in Monetization.passes do
-			table.insert(
-				passes,
-				{
-					key = p.key,
-					displayName = p.displayName,
-					description = p.description,
-					available = true,
-					owned = p.key == "VIP",
-					price = p.suggestedPrice,
-				}
-			)
+			table.insert(passes, {
+				key = p.key,
+				displayName = p.displayName,
+				description = p.description,
+				available = true,
+				owned = p.key == "VIP",
+				price = p.suggestedPrice,
+			})
 		end
 		for _, p in Monetization.products do
-			table.insert(
-				products,
-				{
-					key = p.key,
-					displayName = p.displayName,
-					description = p.description,
-					available = p.key ~= "CoinsLarge",
-					price = p.suggestedPrice,
-				}
-			)
+			table.insert(products, {
+				key = p.key,
+				displayName = p.displayName,
+				description = p.description,
+				available = p.key ~= "CoinsLarge",
+				price = p.suggestedPrice,
+			})
 		end
 		return { ok = true, passes = passes, products = products }
 	end
@@ -608,6 +596,7 @@ local panels = {
 	{ "Habitat", 1 },
 	{ "Habitat", 2 },
 	{ "Notice", "Hello" },
+	{ "Settings" },
 }
 for _, spec in panels do
 	check("panel " .. spec[1], function()

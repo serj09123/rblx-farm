@@ -100,6 +100,9 @@ local function refresh()
 end
 
 function LeaderboardService:Init()
+	Net.Server.handle("GetLeaderboards", function()
+		return { ok = true, boards = cache }
+	end)
 	if DataService.usingMock then
 		enabled = false
 		return
@@ -114,9 +117,6 @@ function LeaderboardService:Init()
 			enabled = false
 		end
 	end
-	Net.Server.handle("GetLeaderboards", function()
-		return { ok = true, boards = cache }
-	end)
 end
 
 function LeaderboardService:PlayerReady(player: Player)
@@ -125,9 +125,6 @@ end
 
 function LeaderboardService:Start()
 	if not enabled then
-		Net.Server.handle("GetLeaderboards", function()
-			return { ok = true, boards = {} }
-		end)
 		return
 	end
 	-- Final write happens before the profile is released.

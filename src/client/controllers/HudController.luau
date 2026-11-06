@@ -7,6 +7,7 @@ local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Assets = require(Shared.config.Assets)
 local Format = require(Shared.util.Format)
 local IndexConfig = require(Shared.config.Index)
+local Net = require(Shared.net.Net)
 local QuestLogic = require(Shared.logic.QuestLogic)
 
 local ClientState = require(script.Parent.Parent.ClientState)
@@ -157,7 +158,7 @@ function HudController:Init()
 		Name = "TopBar",
 		AnchorPoint = Vector2.new(0.5, 0),
 		Position = UDim2.new(0.5, 0, 0, 6),
-		Size = UDim2.fromOffset(460, 60),
+		Size = UDim2.fromOffset(530, 60),
 		BackgroundTransparency = 1,
 		Parent = root,
 	})
@@ -203,6 +204,42 @@ function HudController:Init()
 	local _ = bar
 	setSkyheart = set
 	UIController:registerElement("Skyheart", skyButton)
+
+	local settingsButton = UI.button(Assets.icons.settings, Theme.colors.panelLight, function()
+		UIController:toggle("Settings")
+	end, {
+		Size = UDim2.fromOffset(56, 56),
+		Position = UDim2.fromOffset(470, 0),
+		TextSize = Theme.textSize.title,
+		Parent = top,
+	})
+	UIController:registerElement("Settings", settingsButton)
+	UIController:registerPanel("Settings", {
+		title = "Settings",
+		icon = Assets.icons.settings,
+		size = Vector2.new(420, 260),
+		build = function(content: Frame)
+			local settings = ClientState.get("settings") or { sfx = true, music = true }
+			local column = UI.new(
+				"Frame",
+				{ Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Parent = content },
+				{
+					UI.list(Enum.FillDirection.Vertical, 10),
+				}
+			)
+			for _, entry in { { key = "sfx", label = "Sound effects" }, { key = "music", label = "Music" } } do
+				local on = settings[entry.key] ~= false
+				UI.button(
+					entry.label .. (if on then ": ON" else ": OFF"),
+					if on then Theme.colors.good else Theme.colors.disabled,
+					function()
+						Net.Client.fire("SetSetting", entry.key, not on)
+					end,
+					{ Size = UDim2.new(1, -20, 0, Theme.touch), Parent = column }
+				)
+			end
+		end,
+	})
 
 	-- Buffs row under the top bar
 	buffsRow = UI.new("Frame", {
@@ -252,6 +289,9 @@ function HudController:Start()
 	for _, key in { "daily", "quests", "index" } do
 		ClientState.observe(key, refreshBadges)
 	end
+	ClientState.observe("settings", function()
+		UIController:refresh("Settings")
+	end)
 	ClientState.observe("modifiers", refreshBuffs)
 	ClientState.observe("boosts", refreshBuffs)
 	ClientState.observe("passes", refreshBuffs)

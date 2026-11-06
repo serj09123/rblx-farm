@@ -11,3 +11,4 @@ DevPackages/
 .DS_Store
 build/
 roblox.yml
+*.bundle

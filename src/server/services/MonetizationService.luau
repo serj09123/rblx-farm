@@ -114,7 +114,12 @@ local function onPromptPurchase(player: Player, kind: string, key: string)
 			Notifier.send(player, "info", "You already own " .. def.displayName, "vip")
 			return
 		end
-		MarketplaceService:PromptGamePassPurchase(player, def.id)
+		local ok, err = pcall(function()
+			MarketplaceService:PromptGamePassPurchase(player, def.id)
+		end)
+		if not ok then
+			warn("[MonetizationService] PromptGamePassPurchase failed: " .. tostring(err))
+		end
 	else
 		local def = Monetization.productByKey[key]
 		if not def or def.id == 0 then
@@ -125,7 +130,12 @@ local function onPromptPurchase(player: Player, kind: string, key: string)
 			Notifier.error(player, "This item isn't available for your account")
 			return
 		end
-		MarketplaceService:PromptProductPurchase(player, def.id)
+		local ok, err = pcall(function()
+			MarketplaceService:PromptProductPurchase(player, def.id)
+		end)
+		if not ok then
+			warn("[MonetizationService] PromptProductPurchase failed: " .. tostring(err))
+		end
 	end
 end
 

@@ -258,7 +258,7 @@ Profile = {
   income: { lastAccrual, carry },
   daily: { lastClaimDay, cycleDay },
   quests: { dayKey, daily = {...}, rerollsUsed, weekKey, weekly = {...} },
-  tutorial: { step, done },
+  tutorial: { step, done, starterGiven },
   purchases: { receipts = { [purchaseId] = ts }, passes = { [passKey] = true } },
   trades: { applied = { [tradeId] = ts } },
   stats: { coinsEarned, hatched, sold, donated, cheersGiven, trades, playSeconds, firstJoin, lastJoin, sessions },
@@ -304,3 +304,18 @@ src/client   StarterPlayerScripts.Client controllers/, ui/
 8. Trade tax 5 % on coins only (inflation sink, discourages RMT); critters untaxed.
 9. Habitat income auto-credits while online; offline income shown in a "Welcome back" popup.
 10. Daily streak never resets (child-friendly).
+
+## 12. Security, performance, analytics (summary)
+
+* **Remotes:** declared once in `net/Remotes.luau`; profile gate → per-player token bucket
+  → argument guards (types, ranges, formats, array shape, no extra args) → `pcall`.
+  25 malformed payloads kick the player. `tests/lune/audit.luau` fails the build if a
+  client→server remote lacks guards, a rate limit or a handler.
+* **Authority:** coins only change in `EconomyService`; critters only enter/leave through
+  `InventoryService` (capacity, reservations, habitat links) or the trade journal.
+* **External services:** every DataStore, MarketplaceService, PolicyService and
+  Players name lookup is `pcall`-wrapped; DataStore calls wait for request budget.
+* **Performance:** 1 s growth tick, 5 s income tick, batched sync with creature deltas,
+  pooled eggs/critters, < ~450 parts with 6 full ranches, StreamingEnabled.
+* **Analytics:** onboarding funnel, economy events, progression (nest tiers), custom events
+  (hatch rarity, mutations, trades, quests, daily, purchases, Bloom rewards), script error count.
