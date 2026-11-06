@@ -10,6 +10,7 @@ return table.freeze({
 	lockCountdownSeconds = 5,
 	idleTimeoutSeconds = 180,
 	unlockAtHatched = 10, -- anti-alt: players must hatch this many before trading
+	historyLimit = 20, -- recent trades kept in the profile for the history panel
 	appliedHistoryDays = 90, -- prune profile.trades.applied entries older than this
 	-- Studio only: ignore PolicyService.IsPaidItemTradingAllowed so you can test trading.
 	ignorePolicyInStudio = true,

@@ -18,21 +18,26 @@ Every known gap is listed here (the code contains no inline TODO markers).
 
 - [ ] Background music: the player is wired (SoundController) and follows the `music` setting; upload a track and set `Assets.sounds.music`.
 - [ ] Localization: UI strings are inline English; move to LocalizationService tables.
-- [ ] Right-to-erasure tooling: a script that removes `u_<userId>` from `PlayerData_v1`,
-      `pending_<userId>` from `TradeJournal_v1`, and the user's entries in the leaderboard
-      stores (see MANUAL_STEPS.md §11).
-- [ ] Admin/support tools: inspect a profile, view a trade record by id, grant compensation.
-- [ ] Cross-server announcements for Mythic hatches (MessagingService), rate limited.
-- [ ] Rejoin cooldown: the in-memory cheer hourly cap resets on rejoin (minor exploit).
-- [ ] Coin packs could scale with progression (currently fixed amounts).
-- [ ] Shop UI: refresh affordability colours on coin changes without rebuilding lists.
-- [ ] Profile size monitoring (warn when JSON size > 1 MB; hard limit is 4 MB).
+- [x] Right-to-erasure tooling: `scripts/erase-user.luau` (Open Cloud; run with `--dry-run`
+      first, it has not been run against the live service). See MANUAL_STEPS.md §11.
+- [x] Admin/support tools: `/inspect`, `/trade`, `/grant` chat commands (`AdminService`,
+      allow-list in `config/Admin.luau`, audit-logged).
+- [x] Cross-server announcements for Mythic hatches (`GlobalAnnounceService`, rate limited
+      on both publish and receive).
+- [x] Rejoin cooldown: cheer history is keyed by UserId and survives rejoining the same
+      server (still per server; a server hop resets it).
+- [x] Coin packs scale with the player's tier (`Rewards.tierCoinScale`); the shop shows
+      the scaled amount.
+- [x] Shop UI: affordability colours refresh in place on coin changes.
+- [x] Profile size monitoring (warn at 1 MB, error at 3 MB; once per level per profile).
 
 ## Nice to have
 
 - [ ] Play-test the new visuals (WorldDecor, AtmosphereController) in Studio; tune part count / Atmosphere density on mobile.
-- [ ] Real critter models, hatch animation, habitat decorations (cosmetic coin sink).
+- [x] Hatch animation.
+- [ ] Real critter models and habitat decorations (cosmetic coin sink): need art / a design
+      decision on pricing.
 - [ ] Friends/party: teleport to a friend's server, "visit ranch" button.
-- [ ] Gamepad navigation polish (buttons are Activated-based, so they work, but there is no
-      selection highlight).
-- [ ] Trade history panel (records already exist in `TradeJournal_v1`).
+- [x] Gamepad navigation: bright selection ring (`SelectionImageObject`). Not tested with a
+      real controller.
+- [x] Trade history panel (last 20 trades are kept in the profile: `trades.history`).

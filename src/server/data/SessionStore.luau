@@ -32,6 +32,10 @@ export type Options = {
 	saveAttempts: number,
 	backoffBase: number,
 	log: ((level: string, message: string) -> ())?,
+	-- Optional: serialized size in bytes of a profile (used to warn before the 4 MB limit).
+	sizeOf: ((data: { [string]: any }) -> number)?,
+	sizeWarnBytes: number?,
+	sizeErrorBytes: number?,
 }
 
 export type Profile = {
@@ -155,7 +159,34 @@ end
 type ProfileImpl = Profile & {
 	_store: SessionStore,
 	_saving: boolean,
+	_sizeLevel: number?,
 }
+
+-- Logs once per severity increase so a large profile does not spam every autosave.
+local function checkSize(self: ProfileImpl, opts: Options)
+	local sizeOf = opts.sizeOf
+	if not sizeOf then
+		return
+	end
+	local ok, bytes = pcall(sizeOf, self.data)
+	if not ok or type(bytes) ~= "number" then
+		return
+	end
+	local level = 0
+	if bytes >= (opts.sizeErrorBytes or 3_000_000) then
+		level = 2
+	elseif bytes >= (opts.sizeWarnBytes or 1_000_000) then
+		level = 1
+	end
+	if level > (self._sizeLevel or 0) then
+		log(
+			opts,
+			if level == 2 then "error" else "warn",
+			string.format("Profile %s is %d bytes (hard limit 4,000,000)", self.key, bytes)
+		)
+	end
+	self._sizeLevel = level
+end
 
 local function writeRecord(self: ProfileImpl, releasing: boolean, includeData: boolean): (boolean, string?)
 	local opts = self._store._opts
@@ -168,6 +199,7 @@ local function writeRecord(self: ProfileImpl, releasing: boolean, includeData: b
 		if problem then
 			log(opts, "error", "Profile " .. self.key .. " contains unserializable data at " .. problem)
 		end
+		checkSize(self, opts)
 	end
 
 	while self._saving do

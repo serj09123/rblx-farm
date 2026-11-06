@@ -9,6 +9,7 @@ export type RarityDef = {
 	luckAffected: boolean, -- luck multiplies this rarity's weight
 	essence: number, -- Skyheart essence granted on hatch
 	announceServer: boolean, -- broadcast a server-wide message on hatch
+	announceGlobal: boolean?, -- also broadcast to every server (MessagingService)
 	celebrate: number, -- 0 = toast, 1 = popup, 2 = full-screen burst
 }
 
@@ -73,6 +74,7 @@ Rarities.list = {
 		luckAffected = true,
 		essence = 400,
 		announceServer = true,
+		announceGlobal = true,
 		celebrate = 2,
 	},
 } :: { RarityDef }

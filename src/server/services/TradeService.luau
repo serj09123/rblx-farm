@@ -280,7 +280,7 @@ local function syncAfterApply(player: Player, half: TradeRules.Half)
 			ServerEvents.creatureObtained:Fire(player, live, "trade")
 		end
 	end
-	SyncService:markDirty(player, "coins", "stats", "habitats")
+	SyncService:markDirty(player, "coins", "stats", "habitats", "tradeHistory")
 end
 
 local function execute(session: TradeSession.TradeSession)
@@ -387,9 +387,17 @@ local function onCancel(player: Player)
 	end
 end
 
+-- Support tooling: reads a committed trade record by id.
+function TradeService:getRecord(tradeId: string): (boolean, any)
+	return journal:getRecord(tradeId)
+end
+
 -- Lifecycle ---------------------------------------------------------------------
 
 function TradeService:Init()
+	SyncService:registerProvider("tradeHistory", function(_player: Player, data: Types.Profile)
+		return data.trades.history
+	end)
 	journal = TradeJournal.new(DataService.createAdapter(DataConfig.tradeJournalStoreName), os.time, log)
 
 	InventoryService:setReservationCheck(function(player: Player, creatureId: string): boolean

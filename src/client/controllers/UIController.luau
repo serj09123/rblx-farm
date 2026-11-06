@@ -201,6 +201,14 @@ function UIController:Init()
 		Parent = playerGui,
 	})
 	uiScale = UI.new("UIScale", { Parent = screen })
+	-- Gamepad/keyboard focus ring: a bright rounded outline instead of the default
+	-- thin white box, so the selected button is obvious from the couch.
+	local selection = UI.new("Frame", {
+		Name = "SkyheartSelection",
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+	}, { UI.corner(14), UI.stroke(Color3.fromRGB(255, 235, 120), 4) })
+	playerGui.SelectionImageObject = selection
 	overlayScreen = UI.new("ScreenGui", {
 		Name = "SkyheartOverlay",
 		ResetOnSpawn = false,

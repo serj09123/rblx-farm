@@ -104,6 +104,55 @@ return function()
 			expect(a.coins).to.equal(800)
 		end)
 
+		it("records a bounded history with partner, counts and best rarity", function()
+			local a = profile(1000, { 1 })
+			local b = profile(0, { 2 })
+			b.creatures[id(2)].rarity = "Epic"
+			local halfA, halfB = TradeRules.halves(
+				"h1",
+				11,
+				a,
+				{ creatures = { id(1) }, coins = 100 },
+				22,
+				b,
+				{ creatures = { id(2) }, coins = 0 },
+				50
+			)
+			TradeRules.applyHalf(a, halfA, 50)
+			TradeRules.applyHalf(b, halfB, 50)
+			expect(#a.trades.history).to.equal(1)
+			local entry = a.trades.history[1]
+			expect(entry.partner).to.equal(22)
+			expect(entry.gave).to.equal(1)
+			expect(entry.got).to.equal(1)
+			expect(entry.top).to.equal("Epic")
+			expect(entry.coins).to.equal(-100)
+			expect(b.trades.history[1].coins).to.equal(TradeRules.taxed(100))
+			-- reapplying is a no-op
+			TradeRules.applyHalf(a, halfA, 60)
+			expect(#a.trades.history).to.equal(1)
+			-- the list never grows past the limit
+			for n = 1, TradeConfig.historyLimit + 5 do
+				table.insert(a.trades.history, { id = "x" .. n, at = n, gave = 0, got = 0, coins = 0 })
+			end
+			local c = profile(0, { 3 })
+			local d = profile(0, { 4 })
+			local halfC = TradeRules.halves(
+				"h2",
+				33,
+				c,
+				{ creatures = { id(3) }, coins = 0 },
+				44,
+				d,
+				{ creatures = {}, coins = 0 },
+				70
+			)
+			c.trades.history = a.trades.history
+			TradeRules.applyHalf(c, halfC, 70)
+			expect(#c.trades.history).to.equal(TradeConfig.historyLimit)
+			expect(c.trades.history[#c.trades.history].id).to.equal("h2")
+		end)
+
 		it("refuses to apply when the profile no longer matches", function()
 			local a = profile(0, { 1 })
 			local b = profile(0, { 2 })

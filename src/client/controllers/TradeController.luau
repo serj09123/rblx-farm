@@ -39,6 +39,94 @@ local function isActive(): boolean
 	return state ~= nil and state.state ~= "done" and state.state ~= "cancelled"
 end
 
+-- History ------------------------------------------------------------------------
+
+local partnerNames: { [number]: string } = {}
+local requestedNames: { [number]: boolean } = {}
+
+local function partnerName(userId: number?): string
+	if not userId then
+		return "Someone"
+	end
+	local cached = partnerNames[userId]
+	if cached then
+		return cached
+	end
+	local online = Players:GetPlayerByUserId(userId)
+	if online then
+		partnerNames[userId] = online.DisplayName
+		return online.DisplayName
+	end
+	if not requestedNames[userId] then
+		requestedNames[userId] = true
+		task.spawn(function()
+			local ok, name = pcall(function()
+				return Players:GetNameFromUserIdAsync(userId)
+			end)
+			if ok and type(name) == "string" then
+				partnerNames[userId] = name
+				if UIController:currentPanel() == "TradeHistory" then
+					UIController:refresh("TradeHistory")
+				end
+			end
+		end)
+	end
+	return "Player " .. userId
+end
+
+local function buildHistory(content: Frame)
+	local list = UI.scroll({ Parent = content })
+	UI.list(Enum.FillDirection.Vertical, 8).Parent = list
+	local history = ClientState.get("tradeHistory") or {}
+	if #history == 0 then
+		UI.label("No trades yet. Completed trades show up here.", { Size = UDim2.new(1, -12, 0, 50), Parent = list })
+		return
+	end
+	-- Newest first.
+	for order = #history, 1, -1 do
+		local entry = history[order]
+		local frame = UI.new("Frame", {
+			Size = UDim2.new(1, -12, 0, 64),
+			BackgroundColor3 = Theme.colors.panelLight,
+			LayoutOrder = #history - order,
+			Parent = list,
+		}, { UI.corner(12) })
+		UI.label(Assets.icons.trade .. " " .. partnerName(entry.partner), {
+			Size = UDim2.new(0.55, 0, 0, 28),
+			Position = UDim2.fromOffset(12, 6),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Parent = frame,
+		})
+		UI.label(os.date("%Y-%m-%d %H:%M", entry.at), {
+			Size = UDim2.new(0.55, 0, 0, 22),
+			Position = UDim2.fromOffset(12, 36),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextSize = Theme.textSize.small,
+			Font = Theme.fontBody,
+			TextColor3 = Theme.colors.textDim,
+			Parent = frame,
+		})
+		local sign = if entry.coins >= 0 then "+" else "-"
+		local summary = string.format(
+			"gave %d · got %d%s\n%s %s%s",
+			entry.gave,
+			entry.got,
+			if entry.top then " (best: " .. entry.top .. ")" else "",
+			Assets.icons.coins,
+			sign,
+			Format.number(math.abs(entry.coins))
+		)
+		UI.label(summary, {
+			Size = UDim2.new(0.42, -12, 1, -8),
+			Position = UDim2.new(0.58, 0, 0, 4),
+			TextXAlignment = Enum.TextXAlignment.Right,
+			TextSize = Theme.textSize.small,
+			TextColor3 = if entry.coins >= 0 then Theme.colors.good else Theme.colors.warn,
+			Parent = frame,
+		})
+	end
+end
+
 -- Player list --------------------------------------------------------------------
 
 local function buildPlayers(content: Frame)
@@ -62,6 +150,9 @@ local function buildPlayers(content: Frame)
 		)
 		return
 	end
+	UI.button(Assets.icons.trade .. " History", Theme.colors.info, function()
+		UIController:open("TradeHistory")
+	end, { Size = UDim2.fromOffset(150, 40), Parent = list })
 	UI.label("Trades are checked by the server. Coins are taxed " .. math.floor(Economy.tradeCoinTax * 100) .. "%.", {
 		Size = UDim2.new(1, -12, 0, 28),
 		TextSize = Theme.textSize.small,
@@ -329,6 +420,12 @@ function TradeController:Init()
 		"Trade",
 		{ title = "Trade", icon = Assets.icons.trade, size = Vector2.new(560, 400), build = buildPlayers }
 	)
+	UIController:registerPanel("TradeHistory", {
+		title = "Trade history",
+		icon = Assets.icons.trade,
+		size = Vector2.new(560, 400),
+		build = buildHistory,
+	})
 	UIController:registerPanel("TradeWindow", {
 		title = "Trading",
 		icon = Assets.icons.trade,
@@ -355,6 +452,11 @@ function TradeController:Init()
 end
 
 function TradeController:Start()
+	ClientState.observe("tradeHistory", function()
+		if UIController:currentPanel() == "TradeHistory" then
+			UIController:refresh("TradeHistory")
+		end
+	end)
 	Net.Client.on("TradeIncoming", showIncoming)
 	Net.Client.on("TradeState", onState)
 	-- Closing the critter picker returns to the open trade window.

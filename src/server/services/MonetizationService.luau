@@ -7,7 +7,9 @@ local Players = game:GetService("Players")
 
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Monetization = require(Shared.config.Monetization)
+local Format = require(Shared.util.Format)
 local Net = require(Shared.net.Net)
+local Progression = require(Shared.logic.Progression)
 
 local ReceiptLogic = require(script.Parent.Parent.data.ReceiptLogic)
 local Analytics = require(script.Parent.Analytics)
@@ -50,6 +52,13 @@ local function price(kind: "pass" | "product", id: number): number?
 	return nil
 end
 
+-- Coin packs keep their value as the economy grows: scaled by the player's tier.
+local function packCoins(player: Player, def: Monetization.ProductDef): number
+	local data = DataService:get(player)
+	local tier = if data then Progression.tier(data.stats.hatched) else 1
+	return Progression.scaleCoins(def.coins or 0, tier)
+end
+
 -- Applies a product's effect. Errors propagate so the receipt is retried.
 local function grant(player: Player, def: Monetization.ProductDef)
 	if def.key == "LuckBoost15" then
@@ -61,7 +70,7 @@ local function grant(player: Player, def: Monetization.ProductDef)
 	elseif def.key == "ServerBloom" then
 		SkyheartService:triggerPurchasedBloom(player)
 	elseif def.coins then
-		EconomyService:add(player, def.coins, "product_" .. def.key, "IAP")
+		EconomyService:add(player, packCoins(player, def), "product_" .. def.key, "IAP")
 	else
 		error("No grant handler for product " .. def.key)
 	end
@@ -154,17 +163,18 @@ local function shopCatalogue(player: Player): any
 	local products = {}
 	for _, def in Monetization.products do
 		if not isHidden(player, def) then
+			local coins = if def.coins then packCoins(player, def) else nil
 			table.insert(products, {
 				key = def.key,
 				displayName = def.displayName,
-				description = def.description,
+				description = if coins then "+" .. Format.number(coins) .. " coins" else def.description,
 				available = def.id ~= 0,
 				price = price("product", def.id),
 				paidRandom = def.paidRandom,
 				luckMultiplier = def.luckMultiplier,
 				growthMultiplier = def.growthMultiplier,
 				durationSeconds = def.durationSeconds,
-				coins = def.coins,
+				coins = coins,
 			})
 		end
 	end

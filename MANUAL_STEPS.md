@@ -178,7 +178,12 @@ rojo serve test.project.json
 - **Right to Erasure.** Roblox присылает запросы на удаление данных пользователя
   (сообщения в Creator Hub). Нужно удалить ключи: `u_<UserId>` в DataStore `PlayerData_v1`,
   `pending_<UserId>` в `TradeJournal_v1` и записи `<UserId>` в `LB_CoinsEarned_v1`
-  и `LB_IndexEntries_v1`. Инструмент для этого — в TODO.md.
+  и `LB_IndexEntries_v1`. Инструмент: `ROBLOX_API_KEY=... lune run scripts/erase-user <universeId> <userId> --dry-run`
+  (сначала dry-run; ключу Open Cloud нужны права на удаление записей DataStore и запись в Ordered DataStore).
+- **Админ-инструменты.** Впиши UserId сотрудников в `src/shared/config/Admin.luau`. Команды в чате:
+  `/inspect <ник>`, `/trade <id>`, `/grant <ник> <монеты>`. Владелец игры — админ по умолчанию.
+  Все действия пишутся в серверный лог (`[Admin]`).
+- **Cross-server объявления** о Mythic используют MessagingService; ничего настраивать не нужно.
 - **Сезонные события** добавляются в `src/shared/config/Seasons.luau` (даты в UTC unix-времени),
   после этого нужен Publish.
 - **Не переименовывай** DataStore в `config/Data.luau`, иначе игроки потеряют прогресс.

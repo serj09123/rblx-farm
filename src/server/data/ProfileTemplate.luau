@@ -27,7 +27,7 @@ function ProfileTemplate.create(): Types.Profile
 		quests = { dayKey = -1, daily = {}, rerollsUsed = 0, weekKey = -1, weekly = {} },
 		tutorial = { step = 1, done = false, starterGiven = false },
 		purchases = { receipts = {}, passes = {} },
-		trades = { applied = {} },
+		trades = { applied = {}, history = {} },
 		stats = {
 			coinsEarned = 0,
 			hatched = 0,

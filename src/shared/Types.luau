@@ -28,6 +28,16 @@ export type QuestState = {
 	claimed: boolean,
 }
 
+export type TradeHistoryEntry = {
+	id: string,
+	at: number,
+	partner: number?, -- partner's UserId
+	gave: number, -- critters given
+	got: number, -- critters received
+	coins: number, -- net coins (after tax)
+	top: string?, -- best rarity received
+}
+
 export type Profile = {
 	schemaVersion: number,
 	coins: number,
@@ -53,7 +63,7 @@ export type Profile = {
 	},
 	tutorial: { step: number, done: boolean, starterGiven: boolean },
 	purchases: { receipts: { [string]: number }, passes: { [string]: boolean } },
-	trades: { applied: { [string]: number } },
+	trades: { applied: { [string]: number }, history: { TradeHistoryEntry } },
 	stats: {
 		coinsEarned: number,
 		hatched: number,

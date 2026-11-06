@@ -19,7 +19,8 @@ local ServerEvents = require(script.Parent.Parent.ServerEvents)
 
 local CheerService = {}
 
-local recent: { [Player]: { number } } = {}
+-- Keyed by userId and kept after leaving, so rejoining does not reset the hourly cap.
+local recent: { [number]: { number } } = {}
 
 local MESSAGES = {
 	self = "That's your own nest!",
@@ -46,8 +47,8 @@ local function onCheer(helper: Player, ownerUserId: number, slot: number)
 
 	local nest = ownerData.nests[tostring(slot)]
 	local now = os.time()
-	local history = recent[helper] or {}
-	recent[helper] = history
+	local history = recent[helper.UserId] or {}
+	recent[helper.UserId] = history
 	local check = CoopMath.checkCheer(nest, owner.UserId, helper.UserId, history, now)
 	if check ~= "ok" then
 		Notifier.error(helper, MESSAGES[check] or "Can't cheer")
@@ -80,8 +81,13 @@ function CheerService:Init()
 end
 
 function CheerService:Start()
+	-- Drop histories whose entries have all expired so the table cannot grow forever.
 	Players.PlayerRemoving:Connect(function(player)
-		recent[player] = nil
+		task.delay(3700, function()
+			if not Players:GetPlayerByUserId(player.UserId) then
+				recent[player.UserId] = nil
+			end
+		end)
 	end)
 end
 

@@ -36,6 +36,26 @@ end
 
 -- Nests -------------------------------------------------------------------------
 
+-- Buttons whose colour depends on the coin balance. Recoloured in place when coins
+-- change, so lists never rebuild (and jump) while the player scrolls.
+local tracked: { { button: TextButton, cost: number } } = {}
+
+local function track(button: TextButton, cost: number)
+	table.insert(tracked, { button = button, cost = cost })
+end
+
+local function refreshAffordability()
+	local coins = ClientState.get("coins") or 0
+	for i = #tracked, 1, -1 do
+		local entry = tracked[i]
+		if not entry.button.Parent then
+			table.remove(tracked, i)
+		else
+			entry.button.BackgroundColor3 = if coins >= entry.cost then Theme.colors.good else Theme.colors.disabled
+		end
+	end
+end
+
 local function buildShop(content: Frame)
 	local tabs = UI.new("Frame", { Size = UDim2.new(1, 0, 0, 46), BackgroundTransparency = 1, Parent = content }, {
 		UI.list(Enum.FillDirection.Horizontal, 8, Enum.HorizontalAlignment.Left),
@@ -117,7 +137,7 @@ local function buildShop(content: Frame)
 				else nil,
 			{ Size = UDim2.fromOffset(100, 52), Position = UDim2.new(1, -224, 0.5, -26), Parent = frame }
 		)
-		UI.button(
+		local buy5 = UI.button(
 			"x5",
 			if unlocked and coins >= (def.cost or 0) * 5 then Theme.colors.good else Theme.colors.disabled,
 			if unlocked
@@ -127,6 +147,10 @@ local function buildShop(content: Frame)
 				else nil,
 			{ Size = UDim2.fromOffset(100, 52), Position = UDim2.new(1, -114, 0.5, -26), Parent = frame }
 		)
+		if unlocked then
+			track(buy1, def.cost or 0)
+			track(buy5, (def.cost or 0) * 5)
+		end
 		if def.id == "meadow" then
 			UIController:registerElement("BuyMeadow", buy1)
 		end
@@ -332,7 +356,7 @@ local function buildUpgrades(content: Frame)
 				Parent = frame,
 			}
 		)
-		UI.button(
+		local upgradeButton = UI.button(
 			if cost then Assets.icons.coins .. " " .. Format.number(cost) else "MAX",
 			if cost and coins >= cost then Theme.colors.good else Theme.colors.disabled,
 			if cost
@@ -342,6 +366,9 @@ local function buildUpgrades(content: Frame)
 				else nil,
 			{ Size = UDim2.fromOffset(170, 56), Position = UDim2.new(1, -182, 0.5, -28), Parent = frame }
 		)
+		if cost then
+			track(upgradeButton, cost)
+		end
 	end
 end
 
@@ -506,6 +533,7 @@ function ShopController:Start()
 	ClientState.observe("upgrades", function()
 		UIController:refresh("Upgrades")
 	end)
+	ClientState.observe("coins", refreshAffordability)
 end
 
 return ShopController

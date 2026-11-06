@@ -7,6 +7,7 @@
 
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Economy = require(Shared.config.Economy)
+local Rarities = require(Shared.config.Rarities)
 local TableUtil = require(Shared.util.TableUtil)
 local TradeConfig = require(Shared.config.Trade)
 local Types = require(Shared.Types)
@@ -21,6 +22,7 @@ export type Half = {
 	remove: { string }, -- creature ids this player gives away
 	add: { Types.Creature }, -- creatures this player receives
 	coinsDelta: number, -- received (after tax) minus given
+	partnerUserId: number?,
 }
 
 local function isInHabitat(data: Types.Profile, id: string): boolean
@@ -138,6 +140,7 @@ function TradeRules.halves(
 		remove = table.clone(offerA.creatures),
 		add = givenByB,
 		coinsDelta = TradeRules.taxed(offerB.coins) - offerA.coins,
+		partnerUserId = userB,
 	}
 	local halfB: Half = {
 		tradeId = tradeId,
@@ -145,6 +148,7 @@ function TradeRules.halves(
 		remove = table.clone(offerB.creatures),
 		add = givenByA,
 		coinsDelta = TradeRules.taxed(offerA.coins) - offerB.coins,
+		partnerUserId = userA,
 	}
 	return halfA, halfB
 end
@@ -174,6 +178,35 @@ function TradeRules.canApply(data: Types.Profile, half: Half): (boolean, string?
 	return true, nil
 end
 
+-- Keeps a short, bounded list of recent trades for the history panel.
+local function recordHistory(data: Types.Profile, half: Half, now: number)
+	local history = data.trades.history
+	if type(history) ~= "table" then
+		history = {}
+		data.trades.history = history
+	end
+	local top: string? = nil
+	local topOrder = 0
+	for _, creature in half.add do
+		local order = Rarities.order(creature.rarity)
+		if order > topOrder then
+			topOrder, top = order, creature.rarity
+		end
+	end
+	table.insert(history, {
+		id = half.tradeId,
+		at = now,
+		partner = half.partnerUserId,
+		gave = #half.remove,
+		got = #half.add,
+		coins = half.coinsDelta,
+		top = top,
+	})
+	while #history > TradeConfig.historyLimit do
+		table.remove(history, 1)
+	end
+end
+
 -- Applies a half. Returns (ok, changed). Idempotent: an applied trade is a no-op.
 function TradeRules.applyHalf(data: Types.Profile, half: Half, now: number): (boolean, boolean, string?)
 	local ok, reason = TradeRules.canApply(data, half)
@@ -197,6 +230,7 @@ function TradeRules.applyHalf(data: Types.Profile, half: Half, now: number): (bo
 	data.coins = math.min(data.coins + half.coinsDelta, Economy.maxCoins)
 	data.trades.applied[half.tradeId] = now
 	data.stats.trades += 1
+	recordHistory(data, half, now)
 	return true, true, nil
 end
 

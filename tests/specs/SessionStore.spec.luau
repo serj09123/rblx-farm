@@ -175,4 +175,32 @@ return function()
 			expect(profile:save()).to.equal(true)
 		end)
 	end)
+
+	describe("size monitoring", function()
+		it("warns once per severity level and never blocks saves", function()
+			local logs = {}
+			local size = 10
+			local profile = newStore({
+				log = function(level, message)
+					table.insert(logs, level .. ": " .. message)
+				end,
+				sizeOf = function()
+					return size
+				end,
+				sizeWarnBytes = 100,
+				sizeErrorBytes = 1000,
+			}):load("u_size")
+			expect(profile:save()).to.equal(true)
+			expect(#logs).to.equal(0)
+			size = 200
+			expect(profile:save()).to.equal(true)
+			expect(profile:save()).to.equal(true)
+			expect(#logs).to.equal(1)
+			expect(string.find(logs[1], "^warn")).to.be.ok()
+			size = 2000
+			expect(profile:save()).to.equal(true)
+			expect(#logs).to.equal(2)
+			expect(string.find(logs[2], "^error")).to.be.ok()
+		end)
+	end)
 end

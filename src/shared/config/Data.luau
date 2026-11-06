@@ -15,6 +15,9 @@ return table.freeze({
 	bindToCloseBudgetSeconds = 25,
 
 	maxReceiptHistory = 100,
+	-- Profiles are logged when their JSON grows past these sizes (DataStore limit is 4 MB).
+	profileSizeWarnBytes = 1000000,
+	profileSizeErrorBytes = 3000000,
 	-- In Studio without "Enable Studio Access to API Services", fall back to memory.
 	useMockInStudioWhenUnavailable = true,
 })

@@ -249,7 +249,8 @@ local function announceText(payload: any): (string?, Color3)
 		local extra = if payload.mutations and #payload.mutations > 0
 			then " (" .. mutationText(payload.mutations) .. ")"
 			else ""
-		return string.format("%s hatched a %s %s%s!", payload.playerName, payload.rarity, name, extra),
+		local where = if payload.otherServer then " (another server)" else ""
+		return string.format("%s hatched a %s %s%s!%s", payload.playerName, payload.rarity, name, extra, where),
 			rarityColor(payload.rarity)
 	elseif payload.kind == "bloom" then
 		if payload.source == "purchase" then

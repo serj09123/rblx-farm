@@ -85,6 +85,11 @@ function DataService:Init()
 		saveAttempts = DataConfig.saveAttempts,
 		backoffBase = DataConfig.saveBackoffBaseSeconds,
 		log = log,
+		sizeOf = function(data)
+			return #HttpService:JSONEncode(data)
+		end,
+		sizeWarnBytes = DataConfig.profileSizeWarnBytes,
+		sizeErrorBytes = DataConfig.profileSizeErrorBytes,
 	})
 
 	Net.Server.setGate(function(player: Player): boolean

@@ -36,6 +36,8 @@ local ORDER = {
 	"TutorialService",
 	"LeaderboardService",
 	"MonetizationService",
+	"GlobalAnnounceService",
+	"AdminService",
 }
 
 type Service = {

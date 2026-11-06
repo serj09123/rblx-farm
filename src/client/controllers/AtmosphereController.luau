@@ -45,7 +45,6 @@ local KEYFRAMES = {
 }
 
 local atmosphere: Atmosphere?
-local petals: ParticleEmitter?
 local petalAnchor: Part?
 
 local function sample(progress: number)
@@ -137,7 +136,6 @@ local function setupPetals()
 		NumberSequenceKeypoint.new(1, 1),
 	})
 	emitter.Parent = anchor
-	petals = emitter
 end
 
 local function findSkyheart(): (BasePart?, Instance?)
