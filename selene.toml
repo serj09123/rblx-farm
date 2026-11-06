@@ -1,0 +1,6 @@
+std = "roblox+testez"
+
+[lints]
+shadowing = "allow"
+# `script.Parent.X` style requires and Luau type syntax are fine.
+mixed_table = "allow"

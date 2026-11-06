@@ -1,0 +1,32 @@
+{
+  "name": "skyheart-ranch-tests",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Shared": {
+        "$path": "src/shared"
+      },
+      "DevPackages": {
+        "$path": "DevPackages"
+      }
+    },
+    "ServerScriptService": {
+      "Server": {
+        "$path": "src/server"
+      },
+      "Tests": {
+        "$path": "tests/specs"
+      },
+      "RunTests": {
+        "$path": "tests/studio/RunTests.server.luau"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": {
+          "$path": "src/client"
+        }
+      }
+    }
+  }
+}

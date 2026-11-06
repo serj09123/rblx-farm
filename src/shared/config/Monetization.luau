@@ -29,10 +29,34 @@ export type ProductDef = {
 local Monetization = {}
 
 Monetization.passes = {
-	{ key = "DoubleCoins", id = 0, displayName = "Double Coins", description = "x2 coins from selling and habitats. Forever.", suggestedPrice = 299 },
-	{ key = "ExtraNestSlots", id = 0, displayName = "Extra Nest Beds", description = "+2 nest beds on your ranch.", suggestedPrice = 199 },
-	{ key = "BigBackpack", id = 0, displayName = "Big Backpack", description = "+100 critter capacity.", suggestedPrice = 99 },
-	{ key = "VIP", id = 0, displayName = "VIP", description = "Gold VIP tag and golden ranch trim. Cosmetic only.", suggestedPrice = 249 },
+	{
+		key = "DoubleCoins",
+		id = 0,
+		displayName = "Double Coins",
+		description = "x2 coins from selling and habitats. Forever.",
+		suggestedPrice = 299,
+	},
+	{
+		key = "ExtraNestSlots",
+		id = 0,
+		displayName = "Extra Nest Beds",
+		description = "+2 nest beds on your ranch.",
+		suggestedPrice = 199,
+	},
+	{
+		key = "BigBackpack",
+		id = 0,
+		displayName = "Big Backpack",
+		description = "+100 critter capacity.",
+		suggestedPrice = 99,
+	},
+	{
+		key = "VIP",
+		id = 0,
+		displayName = "VIP",
+		description = "Gold VIP tag and golden ranch trim. Cosmetic only.",
+		suggestedPrice = 249,
+	},
 } :: { PassDef }
 
 Monetization.products = {
@@ -72,9 +96,33 @@ Monetization.products = {
 		suggestedPrice = 99,
 		paidRandom = true, -- bloom raises mutation chances
 	},
-	{ key = "CoinsSmall", id = 0, displayName = "Pouch of Coins", description = "+2,500 coins", suggestedPrice = 29, paidRandom = true, coins = 2500 },
-	{ key = "CoinsMedium", id = 0, displayName = "Sack of Coins", description = "+15,000 coins", suggestedPrice = 129, paidRandom = true, coins = 15000 },
-	{ key = "CoinsLarge", id = 0, displayName = "Chest of Coins", description = "+80,000 coins", suggestedPrice = 499, paidRandom = true, coins = 80000 },
+	{
+		key = "CoinsSmall",
+		id = 0,
+		displayName = "Pouch of Coins",
+		description = "+2,500 coins",
+		suggestedPrice = 29,
+		paidRandom = true,
+		coins = 2500,
+	},
+	{
+		key = "CoinsMedium",
+		id = 0,
+		displayName = "Sack of Coins",
+		description = "+15,000 coins",
+		suggestedPrice = 129,
+		paidRandom = true,
+		coins = 15000,
+	},
+	{
+		key = "CoinsLarge",
+		id = 0,
+		displayName = "Chest of Coins",
+		description = "+80,000 coins",
+		suggestedPrice = 499,
+		paidRandom = true,
+		coins = 80000,
+	},
 } :: { ProductDef }
 
 -- Boost durations stack up to this cap.
