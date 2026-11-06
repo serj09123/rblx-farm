@@ -51,7 +51,7 @@ export type Profile = {
 		weekKey: number,
 		weekly: { QuestState },
 	},
-	tutorial: { step: number, done: boolean },
+	tutorial: { step: number, done: boolean, starterGiven: boolean },
 	purchases: { receipts: { [string]: number }, passes: { [string]: boolean } },
 	trades: { applied: { [string]: number } },
 	stats: {

@@ -6,7 +6,7 @@ return table.freeze({
 		{ id = "coins", displayName = "Top Ranchers", storeName = "LB_CoinsEarned_v1", stat = "coinsEarned" },
 		{ id = "index", displayName = "Top Collectors", storeName = "LB_IndexEntries_v1", stat = "indexEntries" },
 	},
-	topCount = 50,
+	topCount = 25,
 	refreshSeconds = 300,
 	writeEverySeconds = 600,
 })

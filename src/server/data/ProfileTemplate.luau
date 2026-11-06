@@ -25,7 +25,7 @@ function ProfileTemplate.create(): Types.Profile
 		income = { lastAccrual = 0, carry = 0 },
 		daily = { lastClaimDay = -1, cycleDay = 0 },
 		quests = { dayKey = -1, daily = {}, rerollsUsed = 0, weekKey = -1, weekly = {} },
-		tutorial = { step = 1, done = false },
+		tutorial = { step = 1, done = false, starterGiven = false },
 		purchases = { receipts = {}, passes = {} },
 		trades = { applied = {} },
 		stats = {
