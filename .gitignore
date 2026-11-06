@@ -1,0 +1,12 @@
+# Roblox / tooling
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+!assets/**/*.rbxm
+sourcemap.json
+Packages/
+ServerPackages/
+DevPackages/
+.DS_Store
+build/
