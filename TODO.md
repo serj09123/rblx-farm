@@ -16,7 +16,7 @@ Every known gap is listed here (the code contains no inline TODO markers).
 
 ## Should do soon
 
-- [ ] Background music: `Assets.sounds.music` and the `music` setting exist but no player is wired.
+- [ ] Background music: the player is wired (SoundController) and follows the `music` setting; upload a track and set `Assets.sounds.music`.
 - [ ] Localization: UI strings are inline English; move to LocalizationService tables.
 - [ ] Right-to-erasure tooling: a script that removes `u_<userId>` from `PlayerData_v1`,
       `pending_<userId>` from `TradeJournal_v1`, and the user's entries in the leaderboard
@@ -30,6 +30,7 @@ Every known gap is listed here (the code contains no inline TODO markers).
 
 ## Nice to have
 
+- [ ] Play-test the new visuals (WorldDecor, AtmosphereController) in Studio; tune part count / Atmosphere density on mobile.
 - [ ] Real critter models, hatch animation, habitat decorations (cosmetic coin sink).
 - [ ] Friends/party: teleport to a friend's server, "visit ranch" button.
 - [ ] Gamepad navigation polish (buttons are Activated-based, so they work, but there is no

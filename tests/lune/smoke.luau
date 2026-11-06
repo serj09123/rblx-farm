@@ -292,6 +292,11 @@ local loader = Loader.new({
 		ColorSequence = roblox.ColorSequence,
 		NumberSequence = roblox.NumberSequence,
 		NumberRange = roblox.NumberRange,
+		NumberSequenceKeypoint = roblox.NumberSequenceKeypoint or {
+			new = function(time, value)
+				return { Time = time, Value = value }
+			end,
+		},
 		TweenInfo = {
 			new = function(...)
 				return { ... }
@@ -445,6 +450,7 @@ local ORDER = {
 	"NotificationController",
 	"HudController",
 	"WorldFxController",
+	"AtmosphereController",
 	"FarmController",
 	"ShopController",
 	"InventoryController",

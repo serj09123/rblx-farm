@@ -1,10 +1,11 @@
 --!strict
 -- Builds the placeholder world: ground, hub (shop, market, upgrades, Skyheart,
--- leaderboards) and the plot islands. Keeps part count low (~300 parts total).
+-- leaderboards) and the plot islands. Decoration lives in WorldDecor (~1000 parts, all non-colliding).
 
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Assets = require(Shared.config.Assets)
 local World = require(Shared.config.World)
+local WorldDecor = require(script.Parent.Parent.WorldDecor)
 
 local WorldService = {}
 
@@ -130,6 +131,7 @@ local function buildHub()
 	light.Range = 30
 	light.Brightness = 2
 	light.Parent = crystal
+	WorldDecor.dressSkyheart(crystal)
 	prompt(pedestal, "Skyheart", "Skyheart", Assets.icons.skyheart)
 	sign(crystal, Assets.icons.skyheart .. " SKYHEART", Vector3.new(0, 7, 0))
 
@@ -155,6 +157,7 @@ local function buildHub()
 	spawn.Duration = 0
 	spawn.Parent = hub
 
+	WorldDecor.decorateHub(hub, World.hub.radius)
 	hub.Parent = worldFolder
 
 	stall(
@@ -270,6 +273,7 @@ local function buildPlot(index: number)
 		pads[slot] = pad
 	end
 
+	WorldDecor.decoratePlot(model, cframe, size, index)
 	model.Parent = worldFolder
 	table.insert(plots, {
 		index = index,

@@ -12,6 +12,7 @@ local ORDER = {
 	"NotificationController",
 	"HudController",
 	"WorldFxController",
+	"AtmosphereController",
 	"FarmController",
 	"ShopController",
 	"InventoryController",

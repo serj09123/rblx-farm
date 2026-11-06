@@ -12,6 +12,7 @@ local Assets = require(Shared.config.Assets)
 local SoundController = {}
 
 local sounds: { [string]: Sound } = {}
+local music: Sound?
 local lastPlayed: { [string]: number } = {}
 
 local function enabled(): boolean
@@ -31,6 +32,35 @@ function SoundController:play(key: string, pitch: number?)
 	lastPlayed[key] = now
 	sound.PlaybackSpeed = pitch or 1
 	sound:Play()
+end
+
+local function refreshMusic()
+	local track = music
+	if not track then
+		return
+	end
+	local settings = ClientState.get("settings")
+	local on = settings == nil or settings.music ~= false
+	if on and not track.Playing then
+		track:Play()
+	elseif not on and track.Playing then
+		track:Pause()
+	end
+end
+
+function SoundController:Start()
+	-- Background music: silent until Assets.sounds.music holds an uploaded track id.
+	if Assets.sounds.music ~= "" then
+		local track = Instance.new("Sound")
+		track.Name = "Music"
+		track.SoundId = Assets.sounds.music
+		track.Volume = 0.25
+		track.Looped = true
+		track.Parent = SoundService
+		music = track
+		ClientState.observe("settings", refreshMusic)
+		refreshMusic()
+	end
 end
 
 function SoundController:Init()
