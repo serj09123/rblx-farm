@@ -134,6 +134,47 @@ local function ensureBedLabel(bed: BasePart): TextLabel
 	return label :: TextLabel
 end
 
+-- Golden sparkles and a warm light rise from the player's own beds when an egg is
+-- ready, so it can be spotted from across the ranch.
+local function setBeacon(bed: BasePart, on: boolean)
+	local emitter = bed:FindFirstChild("ReadyBeacon")
+	if on and not emitter then
+		local sparks = Instance.new("ParticleEmitter")
+		sparks.Name = "ReadyBeacon"
+		sparks.Color = ColorSequence.new(Color3.fromRGB(255, 230, 120), Color3.fromRGB(255, 160, 220))
+		sparks.LightEmission = 1
+		sparks.LightInfluence = 0
+		sparks.Rate = 14
+		sparks.Lifetime = NumberRange.new(1.2, 2)
+		sparks.Speed = NumberRange.new(5, 8)
+		sparks.SpreadAngle = Vector2.new(12, 12)
+		sparks.EmissionDirection = Enum.NormalId.Top
+		sparks.Size = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0.1),
+			NumberSequenceKeypoint.new(0.3, 0.5),
+			NumberSequenceKeypoint.new(1, 0),
+		})
+		sparks.Transparency = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0.9),
+			NumberSequenceKeypoint.new(0.2, 0),
+			NumberSequenceKeypoint.new(1, 1),
+		})
+		sparks.Parent = bed
+		local light = Instance.new("PointLight")
+		light.Name = "ReadyBeaconLight"
+		light.Color = Color3.fromRGB(255, 220, 130)
+		light.Range = 14
+		light.Brightness = 1.5
+		light.Parent = bed
+	elseif not on and emitter then
+		emitter:Destroy()
+		local light = bed:FindFirstChild("ReadyBeaconLight")
+		if light then
+			light:Destroy()
+		end
+	end
+end
+
 local function refreshWorldLabels()
 	local world = plotsFolder()
 	if not world then
@@ -158,6 +199,7 @@ local function refreshWorldLabels()
 			if part:GetAttribute("Kind") == "Bed" and (part:GetAttribute("OwnerUserId") or 0) ~= 0 then
 				local label = ensureBedLabel(part)
 				local state = part:GetAttribute("State")
+				setBeacon(part, state == "ready" and isMine(part))
 				if state == "ready" then
 					label.Text = "READY!"
 					label.TextColor3 = Theme.colors.good

@@ -82,8 +82,79 @@ local function mutationText(mutations: { string }): string
 	return table.concat(names, " · ")
 end
 
+-- Egg wobble, crack and a confetti burst of rarity-coloured shards before the card.
+local function playEggReveal(color: Color3, level: number)
+	local overlay = UIController:overlay()
+	local shakes = if level >= 2 then 6 elseif level >= 1 then 4 else 3
+	local egg = UI.label(Assets.icons.nest, {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.42),
+		Size = UDim2.fromOffset(120, 120),
+		TextSize = 96,
+		ZIndex = 21,
+		Parent = overlay,
+	})
+	local glow = UI.new("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.42),
+		Size = UDim2.fromOffset(60, 60),
+		BackgroundColor3 = color,
+		BackgroundTransparency = 0.6,
+		ZIndex = 20,
+		Parent = overlay,
+	}, { UI.corner(999) })
+	UI.tween(glow, shakes * 0.18, { Size = UDim2.fromOffset(220, 220), BackgroundTransparency = 0.8 })
+	for i = 1, shakes do
+		local tilt = if i % 2 == 0 then -18 else 18
+		UI.tween(egg, 0.09, { Rotation = tilt * (0.6 + i / shakes * 0.6) }, Enum.EasingStyle.Sine)
+		SoundController:play("click", 0.8 + i * 0.12)
+		task.wait(0.09)
+		UI.tween(egg, 0.09, { Rotation = 0 }, Enum.EasingStyle.Sine)
+		task.wait(0.09)
+	end
+	egg.Text = Assets.icons.hatch
+	UI.tween(egg, 0.2, { TextSize = 140, TextTransparency = 1 })
+	UI.tween(glow, 0.3, { Size = UDim2.fromOffset(340, 340), BackgroundTransparency = 1 })
+
+	local pieces = 10 + level * 8
+	for i = 1, pieces do
+		local angle = i / pieces * math.pi * 2 + math.random() * 0.4
+		local distance = 120 + math.random() * (80 + level * 60)
+		local size = 8 + math.random(0, 8)
+		local shard = UI.new("Frame", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.42),
+			Size = UDim2.fromOffset(size, size),
+			Rotation = math.random(0, 90),
+			BackgroundColor3 = if i % 3 == 0 then Color3.new(1, 1, 1) else color,
+			ZIndex = 21,
+			Parent = overlay,
+		}, { UI.corner(3) })
+		UI.tween(shard, 0.55, {
+			Position = UDim2.new(0.5, math.cos(angle) * distance, 0.42, math.sin(angle) * distance + 40),
+			Rotation = shard.Rotation + math.random(-180, 180),
+			BackgroundTransparency = 1,
+		}, Enum.EasingStyle.Quad)
+		task.delay(0.6, function()
+			shard:Destroy()
+		end)
+	end
+	task.delay(0.35, function()
+		egg:Destroy()
+		glow:Destroy()
+	end)
+end
+
 -- Centre popup after a hatch. Level 2 adds a full-screen burst.
 function NotificationController:hatch(payload: any)
+	local creature = payload.creature
+	task.spawn(function()
+		playEggReveal(rarityColor(creature.rarity), payload.celebrate or 0)
+		NotificationController:showHatchCard(payload)
+	end)
+end
+
+function NotificationController:showHatchCard(payload: any)
 	local creature = payload.creature
 	local species = Creatures.byId[creature.species]
 	local color = rarityColor(creature.rarity)
