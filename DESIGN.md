@@ -189,6 +189,10 @@ commit error triggers a re-read; if still unknown both players are saved and kic
 the next load resolves the truth. Result: a trade is either fully applied for both
 players or for neither, even across crashes. Records double as the trade log.
 
+While a trade is open, offered critters are reserved (cannot be sold, donated or
+placed) and offered coins cannot be spent (EconomyService spend guard), so the commit
+can never fail halfway because an item disappeared.
+
 Restrictions: trading unlocks after 10 hatches; disabled for players whose policy has
 `IsPaidItemTradingAllowed = false`; a player can be in one trade at a time; items in a
 trade cannot be sold/donated/placed.

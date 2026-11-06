@@ -15,6 +15,13 @@ local ServerEvents = require(script.Parent.Parent.ServerEvents)
 
 local EconomyService = {}
 
+local spendGuard: ((player: Player, balance: number, amount: number) -> boolean)? = nil
+
+-- TradeService registers a guard so coins offered in a trade cannot be spent.
+function EconomyService:setSpendGuard(fn: (player: Player, balance: number, amount: number) -> boolean)
+	spendGuard = fn
+end
+
 local function updateLeaderstat(player: Player, coins: number)
 	local stats = player:FindFirstChild("leaderstats")
 	local value = stats and stats:FindFirstChild("Coins")
@@ -57,6 +64,9 @@ function EconomyService:spend(player: Player, amount: number, sku: string, txTyp
 	end
 	local cost = math.floor(amount)
 	if cost < 0 or cost ~= cost or data.coins < cost then
+		return false
+	end
+	if spendGuard and not spendGuard(player, data.coins, cost) then
 		return false
 	end
 	data.coins -= cost

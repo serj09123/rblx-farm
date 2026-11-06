@@ -10,7 +10,7 @@ return table.freeze({
 	lockCountdownSeconds = 5,
 	idleTimeoutSeconds = 180,
 	unlockAtHatched = 10, -- anti-alt: players must hatch this many before trading
-	maxDistance = nil :: number?, -- nil = trade from anywhere on the server
 	appliedHistoryDays = 90, -- prune profile.trades.applied entries older than this
-	pendingMarkerMaxAgeDays = 60,
+	-- Studio only: ignore PolicyService.IsPaidItemTradingAllowed so you can test trading.
+	ignorePolicyInStudio = true,
 })

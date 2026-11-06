@@ -68,8 +68,13 @@ local definitions: { [string]: RemoteDef } = {
 		rate = { 10, 4 },
 	},
 	TradeSetCoins = { kind = "event", direction = "c2s", args = { Guard.integer(0, 1e12) }, rate = { 10, 4 } },
-	TradeReady = { kind = "event", direction = "c2s", args = { Guard.boolean }, rate = { 10, 4 } },
-	TradeConfirm = { kind = "event", direction = "c2s", args = {}, rate = { 5, 2 } },
+	TradeReady = {
+		kind = "event",
+		direction = "c2s",
+		args = { Guard.boolean, Guard.integer(0, 1e9) },
+		rate = { 10, 4 },
+	},
+	TradeConfirm = { kind = "event", direction = "c2s", args = { Guard.integer(0, 1e9) }, rate = { 5, 2 } },
 	TradeCancel = { kind = "event", direction = "c2s", args = {}, rate = { 5, 2 } },
 	-- Monetization
 	PromptPurchase = {
