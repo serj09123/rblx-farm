@@ -18,6 +18,10 @@ launch. Code locations are listed so swapping is mechanical.
 | error | errors | silent | short muted buzz |
 | music | background music (not wired yet, see TODO.md) | silent | calm looping track |
 
+Ready-made original replacements (synthesized by `scripts/make-audio.py`, royalty-free) are in
+`assets/audio/*.wav`, one file per key above. Re-run the script to regenerate or tweak them.
+They were not auditioned by ear when generated: listen before uploading.
+
 Upload audio you own or have licensed (Creator Hub → Creations → Development Items → Audio),
 then paste `rbxassetid://<id>`.
 
