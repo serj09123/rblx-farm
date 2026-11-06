@@ -20,6 +20,10 @@ return table.freeze({
 	habitatPlaced = Signal.new(),
 	-- (helper, owner, slot: number)
 	cheered = Signal.new(),
+	-- (player, amount: number) essence added to the Skyheart
+	essenceContributed = Signal.new(),
+	-- (playerOrNil, source: "goal" | "purchase")
+	bloomStarted = Signal.new(),
 	-- (player, upgradeId: string, level: number)
 	upgraded = Signal.new(),
 	-- (player, newEntries: number)

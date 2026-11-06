@@ -410,7 +410,7 @@ function FarmService:Start()
 		for _, player in DataService:getLoadedPlayers() do
 			local data = DataService:get(player)
 			if data then
-				updateGrowth(player, data, now) -- integrate at the old rate first
+				updateGrowth(player, data, now) -- catch up before ETAs use the new rate
 				refreshEtas(player, data, now)
 				SyncService:markDirty(player, "growthRate", "incomeRate")
 			end
