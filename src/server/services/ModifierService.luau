@@ -113,6 +113,7 @@ function ModifierService:extendBoost(player: Player, field: "luckUntil" | "growt
 	local current = math.max(data.boosts[field], now)
 	data.boosts[field] = math.min(current + seconds, now + Monetization.maxBoostSeconds)
 	SyncService:markDirty(player, "boosts", "modifiers", "nests")
+	ModifierService.changed:Fire() -- growth ETAs / rates are recomputed by listeners
 end
 
 local function summary(player: Player): any
