@@ -22,7 +22,17 @@ Ready-made original replacements (synthesized by `scripts/make-audio.py`, royalt
 `assets/audio/*.wav`, one file per key above. Re-run the script to regenerate or tweak them.
 They were not auditioned by ear when generated: listen before uploading.
 
-Upload audio you own or have licensed (Creator Hub → Creations → Development Items → Audio),
+Upload from the command line (Open Cloud; MP3 copies of the files are in `assets/audio/`):
+
+```bash
+ROBLOX_API_KEY=... lune run scripts/upload-audio -- --user <yourUserId> --dry-run   # check first
+ROBLOX_API_KEY=... lune run scripts/upload-audio -- --user <yourUserId>
+```
+The key needs `asset:read` + `asset:write`. The script writes the resulting ids into
+`Assets.luau` itself (use `--group <id>` for a group-owned experience). Roblox moderates
+audio, so a sound may be silent in game until it is approved.
+
+Or upload by hand: audio you own or have licensed (Creator Hub → Creations → Development Items → Audio),
 then paste `rbxassetid://<id>`.
 
 ## Icons — `src/shared/config/Assets.luau` → `icons`
