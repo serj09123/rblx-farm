@@ -29,8 +29,7 @@ function MutationRoller.chances(mods: Types.Modifiers?): { [string]: number }
 	return result
 end
 
--- Applies group exclusivity and the per-creature cap. Output keeps config order.
-function MutationRoller.resolve(rolled: { string }): { string }
+local function resolveCapped(rolled: { string }, cap: number): { string }
 	local bestInGroup: { [string]: Mutations.MutationDef } = {}
 	local kept: { Mutations.MutationDef } = {}
 	for _, id in rolled do
@@ -54,7 +53,7 @@ function MutationRoller.resolve(rolled: { string }): { string }
 		return a.multiplier > b.multiplier
 	end)
 	local survivors: { [string]: boolean } = {}
-	for i = 1, math.min(#kept, Mutations.maxPerCreature) do
+	for i = 1, math.min(#kept, cap) do
 		survivors[kept[i].id] = true
 	end
 	local result = {}
@@ -66,7 +65,38 @@ function MutationRoller.resolve(rolled: { string }): { string }
 	return result
 end
 
-function MutationRoller.roll(chances: { [string]: number }, rng: Types.Rng): { string }
+-- Applies group exclusivity and the per-creature cap. Output keeps config order.
+function MutationRoller.resolve(rolled: { string }): { string }
+	return resolveCapped(rolled, Mutations.maxPerCreature)
+end
+
+-- Like resolve, but `forced` (a mutagen) always survives: it displaces any rolled
+-- mutation in its group and takes one of the maxPerCreature slots.
+function MutationRoller.resolveForced(rolled: { string }, forced: string): { string }
+	local forcedDef = Mutations.byId[forced]
+	if not forcedDef then
+		return MutationRoller.resolve(rolled)
+	end
+	local others = {}
+	for _, id in rolled do
+		local def = Mutations.byId[id]
+		if def and id ~= forced and not (forcedDef.group ~= nil and def.group == forcedDef.group) then
+			table.insert(others, id)
+		end
+	end
+	local kept = resolveCapped(others, Mutations.maxPerCreature - 1)
+	table.insert(kept, forced)
+	local result = {}
+	for _, def in Mutations.list do
+		if table.find(kept, def.id) then
+			table.insert(result, def.id)
+		end
+	end
+	return result
+end
+
+-- Independent per-mutation rolls, before group/cap resolution.
+function MutationRoller.rollRaw(chances: { [string]: number }, rng: Types.Rng): { string }
 	local rolled = {}
 	for _, def in Mutations.list do
 		local chance = chances[def.id] or 0
@@ -74,7 +104,11 @@ function MutationRoller.roll(chances: { [string]: number }, rng: Types.Rng): { s
 			table.insert(rolled, def.id)
 		end
 	end
-	return MutationRoller.resolve(rolled)
+	return rolled
+end
+
+function MutationRoller.roll(chances: { [string]: number }, rng: Types.Rng): { string }
+	return MutationRoller.resolve(MutationRoller.rollRaw(chances, rng))
 end
 
 return table.freeze(MutationRoller)

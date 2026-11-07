@@ -1,6 +1,8 @@
 --!strict
--- Placeholder 3D visuals for critters and nests (colored parts + simple effects).
--- Models are pooled by body shape. Replace with real models later (ASSETS_TO_REPLACE.md).
+-- 3D visuals for critters and nests (+ simple effects).
+-- Species with a `modelAssetId` use an uploaded single-MeshPart model (loaded once with
+-- InsertService and pooled per species); the others fall back to coloured primitives pooled
+-- by body shape (ASSETS_TO_REPLACE.md).
 
 local CollectionService = game:GetService("CollectionService")
 
@@ -38,19 +40,7 @@ local SHAPES: { [string]: Enum.PartType } = {
 	Cylinder = Enum.PartType.Cylinder,
 }
 
-local function createModel(shapeName: string): Model
-	local model = Instance.new("Model")
-	local body = basePart("Body", SHAPES[shapeName] or Enum.PartType.Ball)
-	body.Parent = model
-	model.PrimaryPart = body
-	for _, side in { "EyeL", "EyeR" } do
-		local eye = basePart(side, Enum.PartType.Ball)
-		eye.Color = Color3.new(0.05, 0.05, 0.08)
-		eye.Parent = model
-	end
-	local crest = basePart("Crest", Enum.PartType.Block)
-	crest.Parent = model
-
+local function addLabel(model: Model, body: BasePart)
 	local gui = Instance.new("BillboardGui")
 	gui.Name = "Label"
 	gui.Size = UDim2.fromOffset(180, 44)
@@ -76,6 +66,25 @@ local function createModel(shapeName: string): Model
 	sub.TextStrokeTransparency = 0.5
 	sub.Parent = gui
 	gui.Parent = model
+end
+
+local function createModel(shapeName: string): Model
+	local model = Instance.new("Model")
+	-- Atomic: with StreamingEnabled the client must receive the whole critter at once, or the
+	-- idle animation (WorldFxController) captures its base pivot before the parts arrive.
+	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
+	local body = basePart("Body", SHAPES[shapeName] or Enum.PartType.Ball)
+	body.Parent = model
+	model.PrimaryPart = body
+	for _, side in { "EyeL", "EyeR" } do
+		local eye = basePart(side, Enum.PartType.Ball)
+		eye.Color = Color3.new(0.05, 0.05, 0.08)
+		eye.Parent = model
+	end
+	local crest = basePart("Crest", Enum.PartType.Block)
+	crest.Parent = model
+
+	addLabel(model, body)
 	return model
 end
 
@@ -102,6 +111,79 @@ for shapeName in SHAPES do
 	pools[shapeName] = ObjectPool.new(function()
 		return createModel(shapeName)
 	end, resetModel, 24)
+end
+
+-- Mesh models: one template MeshPart per species, loaded in the background at startup.
+-- Until a template is ready (or if loading fails) the species uses the primitive fallback.
+local templates: { [string]: MeshPart } = {}
+local meshPools: { [string]: ObjectPool.ObjectPool<Model> } = {}
+local pendingLoads = 0
+
+local function createMeshModel(speciesId: string): Model
+	local model = Instance.new("Model")
+	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
+	local body = templates[speciesId]:Clone()
+	body.Name = "Body"
+	body.Anchored = true
+	body.CanCollide = false
+	body.CanQuery = false
+	body.CanTouch = false
+	body.CastShadow = false
+	body.Parent = model
+	model.PrimaryPart = body
+	addLabel(model, body)
+	return model
+end
+
+local function loadTemplate(species: Creatures.SpeciesDef)
+	local assetId = tonumber(species.modelAssetId)
+	if not assetId then
+		return
+	end
+	local ok, result = pcall(function()
+		return game:GetService("InsertService"):LoadAsset(assetId)
+	end)
+	if not ok then
+		warn(string.format("[CreatureVisuals] could not load model for %s: %s", species.id, tostring(result)))
+		return
+	end
+	local mesh = (result :: Model):FindFirstChildWhichIsA("MeshPart", true)
+	if not mesh then
+		warn("[CreatureVisuals] model for " .. species.id .. " has no MeshPart")
+		result:Destroy()
+		return
+	end
+	mesh.Parent = nil
+	result:Destroy()
+	for _, child in mesh:GetChildren() do
+		if not child:IsA("SurfaceAppearance") then
+			child:Destroy()
+		end
+	end
+	templates[species.id] = mesh
+	meshPools[species.id] = ObjectPool.new(function()
+		return createMeshModel(species.id)
+	end, resetModel, 24)
+end
+
+for _, species in Creatures.list do
+	if species.modelAssetId then
+		pendingLoads += 1
+		task.spawn(function()
+			loadTemplate(species)
+			pendingLoads -= 1
+		end)
+	end
+end
+
+-- Yields until the mesh templates have finished loading (or `timeout` seconds pass), so
+-- creatures restored right after server start get their real models. Returns immediately
+-- once loading is done.
+function CreatureVisuals.waitUntilReady(timeout: number)
+	local deadline = os.clock() + timeout
+	while pendingLoads > 0 and os.clock() < deadline do
+		task.wait(0.1)
+	end
 end
 
 local function addFx(parent: Instance, instance: Instance)
@@ -131,10 +213,12 @@ function CreatureVisuals.build(creature: Types.Creature, base: CFrame): Model?
 	for _, id in creature.mutations do
 		has[id] = true
 	end
-	local pool = pools[species.shape] or pools.Ball
+	local meshPool = meshPools[species.id]
+	local pool = meshPool or pools[species.shape] or pools.Ball
 	local model = pool:get()
 	model.Name = "Creature_" .. creature.id
 	model:SetAttribute("Shape", species.shape)
+	model:SetAttribute("PoolKey", if meshPool then species.id else species.shape)
 	model:SetAttribute("CreatureId", creature.id)
 
 	local scale = species.scale * creature.size
@@ -145,13 +229,18 @@ function CreatureVisuals.build(creature: Types.Creature, base: CFrame): Model?
 	end
 
 	local body = model:FindFirstChild("Body") :: Part
-	local eyeL = model:FindFirstChild("EyeL") :: Part
-	local eyeR = model:FindFirstChild("EyeR") :: Part
-	local crest = model:FindFirstChild("Crest") :: Part
+	local eyeL = model:FindFirstChild("EyeL") :: Part? -- absent on mesh models (baked in)
+	local eyeR = model:FindFirstChild("EyeR") :: Part?
+	local crest = model:FindFirstChild("Crest") :: Part?
 
 	local bodySize: Vector3
 	local bodyCFrame = base * CFrame.new(0, scale / 2, 0)
-	if species.shape == "Block" then
+	if meshPool then
+		-- Fit the mesh so its largest dimension equals `scale`; modelYawDeg turns it to face -Z.
+		local natural = templates[species.id].Size
+		bodySize = natural * (scale / math.max(natural.X, natural.Y, natural.Z))
+		bodyCFrame = base * CFrame.new(0, bodySize.Y / 2, 0) * CFrame.Angles(0, math.rad(species.modelYawDeg or 0), 0)
+	elseif species.shape == "Block" then
 		bodySize = Vector3.new(scale, scale * 0.8, scale)
 		bodyCFrame = base * CFrame.new(0, scale * 0.4, 0)
 	elseif species.shape == "Cylinder" then
@@ -162,20 +251,25 @@ function CreatureVisuals.build(creature: Types.Creature, base: CFrame): Model?
 	end
 	body.Size = bodySize
 	body.CFrame = bodyCFrame
-	body.Color = rgb(species.color)
+	-- Mesh models carry their own colours in the texture: white keeps it untinted.
+	body.Color = if meshPool then Color3.new(1, 1, 1) else rgb(species.color)
 
-	local faceCFrame = base * CFrame.new(0, scale * 0.6, -scale * 0.45)
-	local eyeSize = math.max(0.2, scale * 0.16)
-	eyeL.Size = Vector3.one * eyeSize
-	eyeR.Size = Vector3.one * eyeSize
-	eyeL.CFrame = faceCFrame * CFrame.new(-scale * 0.18, 0, 0)
-	eyeR.CFrame = faceCFrame * CFrame.new(scale * 0.18, 0, 0)
+	if eyeL and eyeR then
+		local faceCFrame = base * CFrame.new(0, scale * 0.6, -scale * 0.45)
+		local eyeSize = math.max(0.2, scale * 0.16)
+		eyeL.Size = Vector3.one * eyeSize
+		eyeR.Size = Vector3.one * eyeSize
+		eyeL.CFrame = faceCFrame * CFrame.new(-scale * 0.18, 0, 0)
+		eyeR.CFrame = faceCFrame * CFrame.new(scale * 0.18, 0, 0)
+	end
 
-	crest.Size = Vector3.new(scale * 0.3, scale * 0.25, scale * 0.3)
-	crest.CFrame = base
-		* CFrame.new(0, scale * (if species.shape == "Block" then 0.9 else 1.05), 0)
-		* CFrame.Angles(0, math.rad(45), 0)
-	crest.Color = rgb(species.accent)
+	if crest then
+		crest.Size = Vector3.new(scale * 0.3, scale * 0.25, scale * 0.3)
+		crest.CFrame = base
+			* CFrame.new(0, scale * (if species.shape == "Block" then 0.9 else 1.05), 0)
+			* CFrame.Angles(0, math.rad(45), 0)
+		crest.Color = rgb(species.accent)
+	end
 
 	if has.Golden then
 		body.Color = Color3.fromRGB(255, 200, 40)
@@ -186,7 +280,7 @@ function CreatureVisuals.build(creature: Types.Creature, base: CFrame): Model?
 		body.Material = Enum.Material.Ice
 		body.Color = body.Color:Lerp(Color3.fromRGB(170, 230, 255), 0.6)
 	end
-	if has.Harvest then
+	if has.Harvest and crest then
 		crest.Color = Color3.fromRGB(255, 140, 30)
 	end
 	if has.Shiny then
@@ -210,7 +304,9 @@ function CreatureVisuals.build(creature: Types.Creature, base: CFrame): Model?
 	end
 	if has.Cosmic then
 		particles(body, Color3.fromRGB(160, 120, 255), 14)
-		crest.Material = Enum.Material.Neon
+		if crest then
+			crest.Material = Enum.Material.Neon
+		end
 	end
 	if has.Rainbow then
 		CollectionService:AddTag(model, "RainbowFx")
@@ -236,8 +332,8 @@ function CreatureVisuals.build(creature: Types.Creature, base: CFrame): Model?
 end
 
 function CreatureVisuals.release(model: Model)
-	local shape = model:GetAttribute("Shape")
-	local pool = if type(shape) == "string" then pools[shape] else nil
+	local key = model:GetAttribute("PoolKey")
+	local pool = if type(key) == "string" then (meshPools[key] or pools[key]) else nil
 	if pool then
 		pool:release(model)
 	else

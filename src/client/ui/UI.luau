@@ -96,20 +96,41 @@ function UI.label(text: string, props: Props?): TextLabel
 			base[k] = v
 		end
 	end
-	return UI.new("TextLabel", base, { UI.new("UIStroke", { Thickness = 1.5, Transparency = 0.5 }) })
+	return UI.new("TextLabel", base, {
+		UI.new("UIStroke", { Thickness = 2, Color = Theme.colors.outline, Transparency = 0.15 }),
+	})
+end
+
+-- Glossy "candy" look: bright top, darker hard-edged lip at the bottom (multiplies
+-- the button's BackgroundColor3).
+local function candyGradient(): UIGradient
+	return UI.new("UIGradient", {
+		Rotation = 90,
+		Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+			ColorSequenceKeypoint.new(0.74, Color3.fromRGB(222, 222, 222)),
+			ColorSequenceKeypoint.new(0.75, Color3.fromRGB(150, 150, 150)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(135, 135, 135)),
+		}),
+	})
 end
 
 local function pressFeedback(button: GuiButton)
 	local scale = UI.new("UIScale", { Parent = button })
-	local info = TweenInfo.new(0.08, Enum.EasingStyle.Quad)
-	button.MouseButton1Down:Connect(function()
-		TweenService:Create(scale, info, { Scale = 0.92 }):Play()
+	local press = TweenInfo.new(0.08, Enum.EasingStyle.Quad)
+	local hover = TweenInfo.new(0.12, Enum.EasingStyle.Quad)
+	button.MouseEnter:Connect(function()
+		TweenService:Create(scale, hover, { Scale = 1.05 }):Play()
 	end)
-	local function release()
-		TweenService:Create(scale, info, { Scale = 1 }):Play()
-	end
-	button.MouseButton1Up:Connect(release)
-	button.MouseLeave:Connect(release)
+	button.MouseButton1Down:Connect(function()
+		TweenService:Create(scale, press, { Scale = 0.92 }):Play()
+	end)
+	button.MouseButton1Up:Connect(function()
+		TweenService:Create(scale, press, { Scale = 1.05 }):Play()
+	end)
+	button.MouseLeave:Connect(function()
+		TweenService:Create(scale, hover, { Scale = 1 }):Play()
+	end)
 end
 
 -- Big rounded text button. onClick fires on Activated (mouse, touch, gamepad).
@@ -130,9 +151,19 @@ function UI.button(text: string, color: Color3, onClick: (() -> ())?, props: Pro
 		end
 	end
 	local button = UI.new("TextButton", base, {
-		UI.corner(),
-		UI.stroke(Color3.new(0, 0, 0), 2),
-		UI.new("UIStroke", { Thickness = 1.5, Transparency = 0.4, ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual }),
+		UI.corner(14),
+		candyGradient(),
+		UI.new("UIStroke", {
+			Color = Theme.colors.outline,
+			Thickness = 3,
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+		}),
+		UI.new("UIStroke", {
+			Color = Theme.colors.outline,
+			Thickness = 2,
+			Transparency = 0.1,
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual,
+		}),
 	})
 	pressFeedback(button)
 	if onClick then
@@ -179,20 +210,29 @@ end
 function UI.progressBar(color: Color3, props: Props?): (Frame, (fraction: number) -> ())
 	local base: Props = {
 		Size = UDim2.new(1, 0, 0, 14),
-		BackgroundColor3 = Color3.fromRGB(20, 22, 36),
+		BackgroundColor3 = Color3.fromRGB(26, 16, 54),
 	}
 	if props then
 		for k, v in props do
 			base[k] = v
 		end
 	end
-	local frame = UI.new("Frame", base, { UI.corner(7) })
+	local frame = UI.new("Frame", base, {
+		UI.corner(8),
+		UI.new("UIStroke", { Color = Theme.colors.outline, Thickness = 2.5 }),
+	})
 	local fill = UI.new("Frame", {
 		Name = "Fill",
 		Size = UDim2.fromScale(0, 1),
 		BackgroundColor3 = color,
 		Parent = frame,
-	}, { UI.corner(7) })
+	}, {
+		UI.corner(8),
+		UI.new("UIGradient", {
+			Rotation = 90,
+			Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(170, 170, 170)),
+		}),
+	})
 	local function set(fraction: number)
 		fill.Size = UDim2.fromScale(math.clamp(fraction, 0, 1), 1)
 	end

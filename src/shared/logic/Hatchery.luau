@@ -18,6 +18,7 @@ export type Context = {
 	pity: { [string]: number },
 	modifiers: Types.Modifiers?,
 	activeSeasons: { string },
+	forcedMutation: string?, -- mutagen applied to the nest: always present on the result
 }
 
 export type Outcome = {
@@ -60,7 +61,10 @@ function Hatchery.roll(nestDef: Nests.NestDef, ctx: Context, rng: Types.Rng): Ou
 	end
 	local species = HatchOdds.pick(speciesOdds, rng:NextNumber()) :: string
 
-	local mutations = MutationRoller.roll(MutationRoller.chances(ctx.modifiers), rng)
+	local rolledMutations = MutationRoller.rollRaw(MutationRoller.chances(ctx.modifiers), rng)
+	local mutations = if ctx.forcedMutation
+		then MutationRoller.resolveForced(rolledMutations, ctx.forcedMutation)
+		else MutationRoller.resolve(rolledMutations)
 
 	return {
 		species = species,

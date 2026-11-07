@@ -44,7 +44,7 @@ Quests.daily = {
 		kind = "hatch",
 		target = 25,
 		text = "Hatch %d critters",
-		reward = { coins = 350, scaleWithTier = true },
+		reward = { coins = 350, scaleWithTier = true, keys = { sprout = 1 } },
 	},
 	{
 		id = "d_rare",
@@ -104,7 +104,7 @@ Quests.weekly = {
 		kind = "hatch",
 		target = 150,
 		text = "Hatch %d critters",
-		reward = { coins = 3000, scaleWithTier = true },
+		reward = { coins = 3000, scaleWithTier = true, keys = { moon = 1 } },
 	},
 	{
 		id = "w_essence",
@@ -125,7 +125,7 @@ Quests.weekly = {
 		kind = "discover",
 		target = 3,
 		text = "Discover %d new index entries",
-		reward = { coins = 2500, scaleWithTier = true },
+		reward = { coins = 2500, scaleWithTier = true, keys = { sprout = 2 } },
 	},
 	{ id = "w_upgrade", kind = "upgrade", target = 3, text = "Buy %d upgrades", reward = { growthBoostSeconds = 900 } },
 	{
@@ -133,7 +133,7 @@ Quests.weekly = {
 		kind = "hatchRarePlus",
 		target = 5,
 		text = "Hatch %d Rare or better",
-		reward = { coins = 2000, scaleWithTier = true },
+		reward = { coins = 2000, scaleWithTier = true, keys = { moon = 1 } },
 	},
 } :: { QuestDef }
 

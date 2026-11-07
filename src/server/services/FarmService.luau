@@ -256,6 +256,7 @@ local function onHatch(player: Player, slot: number)
 		pity = data.pity,
 		modifiers = mods,
 		activeSeasons = mods.activeSeasons,
+		forcedMutation = nest.mutagen,
 	}, rng)
 	local isNewSpecies = data.index.species[outcome.species] == nil
 	local source = if def.guaranteed then "tutorial" else "hatch"

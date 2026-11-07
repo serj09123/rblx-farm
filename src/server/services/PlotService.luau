@@ -141,6 +141,7 @@ function PlotService:refreshPad(player: Player, slot: number)
 end
 
 function PlotService:refreshAll(player: Player)
+	CreatureVisuals.waitUntilReady(8) -- first joins after server start wait for mesh models
 	local assignment = assignments[player]
 	if not assignment then
 		return

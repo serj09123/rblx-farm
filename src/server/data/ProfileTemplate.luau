@@ -16,6 +16,8 @@ function ProfileTemplate.create(): Types.Profile
 		coins = Economy.startingCoins,
 		creatures = {},
 		inventoryNests = {},
+		mutagens = {},
+		cases = { keys = { sprout = 0, moon = 0, star = 0 }, pity = { sprout = 0, moon = 0, star = 0 }, opened = 0 },
 		nests = {},
 		habitats = {},
 		upgrades = { nestSlots = 0, habitatSlots = 0, growthSpeed = 0, luck = 0, backpack = 0 },

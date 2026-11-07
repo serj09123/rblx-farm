@@ -34,6 +34,8 @@ return table.freeze({
 	nestPlanted = Signal.new(),
 	-- (playerA, playerB, tradeId: string)
 	tradeCompleted = Signal.new(),
+	-- (player, tierId: string, entry: Cases.Entry)
+	caseOpened = Signal.new(),
 	-- (player, kind: "pass" | "product", key: string)
 	purchased = Signal.new(),
 })

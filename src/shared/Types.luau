@@ -19,6 +19,7 @@ export type NestSlot = {
 	required: number, -- seconds needed
 	lastUpdate: number, -- unix time of last progress integration
 	cheers: { [string]: boolean }, -- userId (string) -> true
+	mutagen: string?, -- mutation id applied from a case mutagen; guaranteed at hatch
 }
 
 export type QuestState = {
@@ -43,6 +44,12 @@ export type Profile = {
 	coins: number,
 	creatures: { [string]: Creature },
 	inventoryNests: { [string]: number },
+	mutagens: { [string]: number }, -- mutation id -> count
+	cases: {
+		keys: { [string]: number }, -- case tier id -> keys
+		pity: { [string]: number }, -- case tier id -> opens since last minGrade+
+		opened: number,
+	},
 	nests: { [string]: NestSlot },
 	habitats: { [string]: string },
 	upgrades: { [string]: number },

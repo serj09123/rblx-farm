@@ -11,6 +11,7 @@ local Types = require(Shared.Types)
 local Valuation = require(Shared.logic.Valuation)
 
 local Theme = require(script.Parent.Theme)
+local Icon = require(script.Parent.Icon)
 local UI = require(script.Parent.UI)
 
 local CreatureCard = {}
@@ -45,13 +46,7 @@ function CreatureCard.create(creature: Types.Creature, options: Options?): TextB
 		card.BackgroundColor3 = Theme.colors.disabled
 	end
 
-	-- Placeholder portrait: coloured circle in the species colour.
-	UI.new("Frame", {
-		Size = UDim2.fromOffset(54, 54),
-		Position = UDim2.new(0.5, -27, 0, 8),
-		BackgroundColor3 = if species then Theme.rgb(species.color) else Color3.new(1, 1, 1),
-		Parent = card,
-	}, { UI.corner(27), UI.stroke(rarityColor, 3) })
+	Icon.portrait(card, species, 54, UDim2.new(0.5, -27, 0, 8), rarityColor)
 
 	UI.label(if species then species.displayName else creature.species, {
 		Size = UDim2.new(1, -8, 0, 22),

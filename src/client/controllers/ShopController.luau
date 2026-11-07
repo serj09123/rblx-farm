@@ -15,6 +15,7 @@ local Upgrades = require(Shared.config.Upgrades)
 
 local ClientState = require(script.Parent.Parent.ClientState)
 local UIController = require(script.Parent.UIController)
+local Icon = require(script.Parent.Parent.ui.Icon)
 local Theme = require(script.Parent.Parent.ui.Theme)
 local UI = require(script.Parent.Parent.ui.UI)
 
@@ -80,12 +81,7 @@ local function buildShop(content: Frame)
 	for order, def in Nests.purchasable do
 		local unlocked = Progression.isNestUnlocked(def.id, hatched)
 		local frame = row(list, 92, order)
-		UI.new("Frame", {
-			Size = UDim2.fromOffset(60, 60),
-			Position = UDim2.fromOffset(12, 16),
-			BackgroundColor3 = Theme.rgb(def.color),
-			Parent = frame,
-		}, { UI.corner(30), UI.stroke(Color3.new(0, 0, 0), 2) })
+		Icon.nest(frame, def.id, Theme.rgb(def.color), 60, UDim2.fromOffset(12, 16))
 		UI.label(def.displayName .. string.format("  (x%d)", owned[def.id] or 0), {
 			Size = UDim2.new(0.5, -80, 0, 30),
 			Position = UDim2.fromOffset(84, 10),

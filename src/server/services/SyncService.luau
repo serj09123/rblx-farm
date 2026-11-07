@@ -23,6 +23,8 @@ local providers: { [string]: Provider } = {}
 local defaultKeys = {
 	"coins",
 	"inventoryNests",
+	"mutagens",
+	"cases",
 	"nests",
 	"habitats",
 	"upgrades",

@@ -43,13 +43,30 @@ Replace with ImageLabels using uploaded decals for a consistent art style
 
 ## Critters — `src/server/CreatureVisuals.luau`
 
-Each critter is a coloured primitive (Ball/Block/Cylinder from `config/Creatures.luau`),
-two eye spheres and a crest block. Replace with real models:
+All 27 species use uploaded mesh models (`modelAssetId` in `config/Creatures.luau`); the primitive
+fallback (coloured Ball/Block/Cylinder with eye spheres and a crest block) only remains for species
+without an id or while a model is still loading/failed.
 
-1. Model each species (25 + event species) as a Model with a PrimaryPart.
-2. Put them in `ReplicatedStorage/Assets/Critters/<speciesId>` (add to the Rojo tree as `.rbxm`).
-3. In `CreatureVisuals.build`, clone the model instead of building primitives; keep the
-   mutation effects (they are applied to the body part / model).
+* Procedural (`tools/models/critters.py`, GLBs in `assets/creatures/<id>/`): puffpaw, bubbloo,
+  thornback, frostwhisk, nimbuswhale.
+* Generated in Studio (`generate_mesh`, one prompt template; assets live on the creator account,
+  no local source): the other 22. The prompt template: "cute chibi stylized toy-like fantasy pet
+  creature for a Roblox game, plump rounded body, big glossy eyes with highlights, small limbs,
+  front facing, soft smooth shading. Creature "<Name>": <description>" (size 2x2x2,
+  maxTriangles 8000, no segmentation). Generations hit a rate limit above ~3 at once.
+* Known weak spots: dandeleap (grey egg instead of a dandelion puff), mossnib (face reads poorly
+  in profile), nimbuswhale (procedural; a generated version would likely look better).
+
+To add a model:
+
+1. Make a single textured MeshPart (procedural script or AI), export `.glb`/`.fbx`, upload as a
+   `Model` asset (Open Cloud `assetType: "Model"`).
+2. Set `modelAssetId = "<assetId>"` on the species. Generated meshes face either way round: look at
+   it from +Z and add `modelYawDeg = 180` if the face points toward +Z (the code needs it to face
+   -Z). `CreatureVisuals` loads each model once with `InsertService:LoadAsset` at server start,
+   fits the largest dimension to `scale` studs, and pools it per species; mutation effects still
+   apply to the body part. Keep triangles low (~5-8k; 6 plots x 8 pads on screen).
+3. Admins can review every species in game with `/showcase` (`src/server/Showcase.luau`).
 4. Portraits in UI (`CreatureCard`) are coloured circles — replace with ViewportFrames or
    rendered thumbnails.
 

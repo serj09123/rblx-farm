@@ -3,6 +3,7 @@
 
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Assets = require(Shared.config.Assets)
+local Cases = require(Shared.config.Cases)
 local DailyRewards = require(Shared.config.DailyRewards)
 local Format = require(Shared.util.Format)
 local Nests = require(Shared.config.Nests)
@@ -30,6 +31,12 @@ local function rewardText(reward: any): string
 		for nestId, count in reward.nests do
 			local def = Nests.byId[nestId]
 			table.insert(parts, string.format("%dx %s", count, if def then def.displayName else nestId))
+		end
+	end
+	if reward.keys then
+		for tierId, count in reward.keys do
+			local tier = Cases.byId[tierId]
+			table.insert(parts, string.format("%dx %s", count, if tier then tier.keyName else tierId))
 		end
 	end
 	if reward.growthBoostSeconds then

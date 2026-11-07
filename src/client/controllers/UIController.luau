@@ -96,16 +96,57 @@ function UIController:open(name: string, ...: any)
 		ZIndex = 10,
 		Parent = screen,
 	}, {
-		UI.corner(18),
-		UI.stroke(Color3.new(0, 0, 0), 3),
+		UI.corner(20),
+		UI.new(
+			"UIStroke",
+			{ Color = Theme.colors.outline, Thickness = 4, ApplyStrokeMode = Enum.ApplyStrokeMode.Border }
+		),
+		UI.new("UIGradient", {
+			Rotation = 90,
+			Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(150, 175, 215)),
+		}),
 		-- Never larger than the safe screen area (phones in portrait/landscape).
 		UI.new("UISizeConstraint", { MaxSize = Vector2.new(size.X, size.Y) }),
 	})
+	-- Header bar (rounded top, square bottom) with a darker edge underneath.
+	UI.new("Frame", {
+		Name = "Header",
+		Size = UDim2.new(1, 0, 0, 56),
+		BackgroundColor3 = Theme.colors.header,
+		Parent = frame,
+	}, {
+		UI.corner(20),
+		UI.new("UIGradient", {
+			Rotation = 90,
+			Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(235, 175, 90)),
+		}),
+	})
+	UI.new("Frame", {
+		Name = "HeaderFill",
+		Position = UDim2.fromOffset(0, 30),
+		Size = UDim2.new(1, 0, 0, 26),
+		BackgroundColor3 = Theme.colors.header,
+		BorderSizePixel = 0,
+		Parent = frame,
+	}, {
+		UI.new("UIGradient", {
+			Rotation = 90,
+			Color = ColorSequence.new(Color3.fromRGB(255, 240, 215), Color3.fromRGB(235, 175, 90)),
+		}),
+	})
+	UI.new("Frame", {
+		Name = "HeaderEdge",
+		Position = UDim2.fromOffset(0, 56),
+		Size = UDim2.new(1, 0, 0, 4),
+		BackgroundColor3 = Theme.colors.headerEdge,
+		BorderSizePixel = 0,
+		Parent = frame,
+	})
 	UI.label((spec.icon and (spec.icon .. " ") or "") .. spec.title, {
-		Size = UDim2.new(1, -120, 0, 40),
-		Position = UDim2.fromOffset(16, 8),
+		Size = UDim2.new(1, -150, 0, 44),
+		Position = UDim2.fromOffset(75, 6),
 		TextSize = Theme.textSize.title,
-		TextXAlignment = Enum.TextXAlignment.Left,
+		TextXAlignment = Enum.TextXAlignment.Center,
 		Parent = frame,
 	})
 	local closeButton = UI.button(Assets.icons.close, Theme.colors.bad, function()

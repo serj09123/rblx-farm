@@ -108,6 +108,9 @@ rojo serve test.project.json
 | GrowthBoost15 | Product | Growth Boost (15 min) | 39 R$ |
 | InstantGrow | Product | Instant Grow | 25 R$ |
 | ServerBloom | Product | Server Bloom | 99 R$ |
+| SproutKeys3 | Product | 3 Sprout Keys (ключи кейсов) | 49 R$ |
+| MoonKeys3 | Product | 3 Moon Keys | 199 R$ |
+| StarKey1 | Product | Star Key | 149 R$ |
 | CoinsSmall | Product | Pouch of Coins (+2,500) | 29 R$ |
 | CoinsMedium | Product | Sack of Coins (+15,000) | 129 R$ |
 | CoinsLarge | Product | Chest of Coins (+80,000) | 499 R$ |
