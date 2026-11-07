@@ -4,11 +4,13 @@
 
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local Assets = require(Shared.config.Assets)
+local Cases = require(Shared.config.Cases)
 local Format = require(Shared.util.Format)
 local Nests = require(Shared.config.Nests)
 local Progression = require(Shared.logic.Progression)
 local Rewards = require(Shared.config.Rewards)
 
+local CaseService = require(script.Parent.CaseService)
 local DataService = require(script.Parent.DataService)
 local EconomyService = require(script.Parent.EconomyService)
 local InventoryService = require(script.Parent.InventoryService)
@@ -16,7 +18,12 @@ local ModifierService = require(script.Parent.ModifierService)
 
 local RewardService = {}
 
-export type Summary = { coins: number, nests: { [string]: number }, growthBoostSeconds: number }
+export type Summary = {
+	coins: number,
+	nests: { [string]: number },
+	keys: { [string]: number },
+	growthBoostSeconds: number,
+}
 
 function RewardService:preview(player: Player, reward: Rewards.Reward): Summary
 	local data = DataService:get(player)
@@ -28,6 +35,7 @@ function RewardService:preview(player: Player, reward: Rewards.Reward): Summary
 	return {
 		coins = coins,
 		nests = if reward.nests then table.clone(reward.nests) else {},
+		keys = if reward.keys then table.clone(reward.keys) else {},
 		growthBoostSeconds = reward.growthBoostSeconds or 0,
 	}
 end
@@ -39,6 +47,9 @@ function RewardService:grant(player: Player, reward: Rewards.Reward, sku: string
 	end
 	for nestId, count in summary.nests do
 		InventoryService:addNests(player, nestId, count)
+	end
+	for tierId, count in summary.keys do
+		CaseService:addKeys(player, tierId, count)
 	end
 	if summary.growthBoostSeconds > 0 then
 		ModifierService:extendBoost(player, "growthUntil", summary.growthBoostSeconds)
@@ -54,6 +65,10 @@ function RewardService:describe(summary: Summary): string
 	for nestId, count in summary.nests do
 		local def = Nests.byId[nestId]
 		table.insert(parts, string.format("%dx %s", count, if def then def.displayName else nestId))
+	end
+	for tierId, count in summary.keys do
+		local tier = Cases.byId[tierId]
+		table.insert(parts, string.format("%dx %s", count, if tier then tier.keyName else tierId))
 	end
 	if summary.growthBoostSeconds > 0 then
 		table.insert(parts, Assets.icons.boost .. " " .. Format.duration(summary.growthBoostSeconds))

@@ -255,13 +255,14 @@ function HudController:Init()
 		Name = "LeftButtons",
 		AnchorPoint = Vector2.new(0, 0.5),
 		Position = UDim2.new(0, 8, 0.45, 0),
-		Size = UDim2.fromOffset(80, 260),
+		Size = UDim2.fromOffset(80, 330),
 		BackgroundTransparency = 1,
 		Parent = root,
 	}, { UI.list(Enum.FillDirection.Vertical, 10) })
 	sideButton(left, "Shop", Assets.icons.nest, "Nests", Color3.fromRGB(110, 190, 90), 1)
 	sideButton(left, "Inventory", Assets.icons.inventory, "Critters", Color3.fromRGB(240, 150, 60), 2)
 	sideButton(left, "Index", Assets.icons.index, "Index", Color3.fromRGB(120, 120, 230), 3)
+	sideButton(left, "Cases", Assets.icons.gift, "Cases", Color3.fromRGB(230, 110, 150), 4)
 
 	-- Right column (kept above the jump button area)
 	local right = UI.new("Frame", {

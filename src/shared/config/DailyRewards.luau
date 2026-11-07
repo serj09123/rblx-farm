@@ -10,7 +10,7 @@ return table.freeze({
 		{ nests = { meadow = 3 } },
 		{ coins = 400, scaleWithTier = true },
 		{ growthBoostSeconds = 600 },
-		{ coins = 800, scaleWithTier = true },
-		{ nests = { skyheart = 1 } },
+		{ coins = 800, scaleWithTier = true, keys = { sprout = 1 } },
+		{ nests = { skyheart = 1 }, keys = { moon = 1 } },
 	} :: { RewardsConfig.Reward },
 })

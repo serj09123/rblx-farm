@@ -24,6 +24,7 @@ export type ProductDef = {
 	growthMultiplier: number?,
 	durationSeconds: number?,
 	coins: number?,
+	caseKeys: { [string]: number }?, -- case tier id -> keys granted
 }
 
 local Monetization = {}
@@ -95,6 +96,33 @@ Monetization.products = {
 		description = "Make the Skyheart bloom for EVERYONE on this server.",
 		suggestedPrice = 99,
 		paidRandom = true, -- bloom raises mutation chances
+	},
+	{
+		key = "SproutKeys3",
+		id = 0,
+		displayName = "3 Sprout Keys",
+		description = "3 keys for Sprout Cases. See the case odds before buying.",
+		suggestedPrice = 49,
+		paidRandom = true,
+		caseKeys = { sprout = 3 },
+	},
+	{
+		key = "MoonKeys3",
+		id = 0,
+		displayName = "3 Moon Keys",
+		description = "3 keys for Moonlit Cases. See the case odds before buying.",
+		suggestedPrice = 199,
+		paidRandom = true,
+		caseKeys = { moon = 3 },
+	},
+	{
+		key = "StarKey1",
+		id = 0,
+		displayName = "Star Key",
+		description = "1 key for a Starforged Case. See the case odds before buying.",
+		suggestedPrice = 149,
+		paidRandom = true,
+		caseKeys = { star = 1 },
 	},
 	{
 		key = "CoinsSmall",

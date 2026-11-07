@@ -11,6 +11,7 @@ local ClientState = require(script.Parent.Parent.ClientState)
 local CreatureCard = require(script.Parent.Parent.ui.CreatureCard)
 local InventoryController = require(script.Parent.InventoryController)
 local UIController = require(script.Parent.UIController)
+local Icons = require(Shared.config.Icons)
 local Theme = require(script.Parent.Parent.ui.Theme)
 local UI = require(script.Parent.Parent.ui.UI)
 
@@ -28,7 +29,7 @@ local function buildPlant(content: Frame, slot: number)
 			local button = UI.button(
 				string.format(
 					"%s %s  x%d  ·  %s",
-					Assets.icons.nest,
+					Icons.nestIcon(def.id),
 					def.displayName,
 					count,
 					Format.duration(def.growSeconds)

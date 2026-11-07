@@ -11,6 +11,7 @@ local Rarities = require(Shared.config.Rarities)
 
 local ClientState = require(script.Parent.Parent.ClientState)
 local UIController = require(script.Parent.UIController)
+local Icon = require(script.Parent.Parent.ui.Icon)
 local Theme = require(script.Parent.Parent.ui.Theme)
 local UI = require(script.Parent.Parent.ui.UI)
 
@@ -101,12 +102,7 @@ local function buildIndex(content: Frame)
 			LayoutOrder = order,
 			Parent = gridFrame,
 		}, { UI.corner(12), UI.stroke(color, 2) })
-		UI.new("Frame", {
-			Size = UDim2.fromOffset(36, 36),
-			Position = UDim2.new(0.5, -18, 0, 6),
-			BackgroundColor3 = if entry then Theme.rgb(species.color) else Color3.fromRGB(20, 20, 30),
-			Parent = cell,
-		}, { UI.corner(18) })
+		Icon.portrait(cell, species, 38, UDim2.new(0.5, -19, 0, 5), color, entry ~= nil)
 		UI.label(if entry then species.displayName else "???", {
 			Size = UDim2.new(1, -6, 0, 22),
 			Position = UDim2.fromOffset(3, 44),

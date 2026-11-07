@@ -8,20 +8,23 @@ Theme.designResolution = Vector2.new(960, 540)
 Theme.minScale = 0.6
 Theme.maxScale = 1.4
 
-Theme.font = Enum.Font.FredokaOne
-Theme.fontBody = Enum.Font.GothamBold
+Theme.font = Enum.Font.LuckiestGuy
+Theme.fontBody = Enum.Font.GothamBlack
 
 Theme.colors = {
-	panel = Color3.fromRGB(32, 36, 58),
-	panelLight = Color3.fromRGB(48, 54, 84),
-	card = Color3.fromRGB(58, 64, 98),
+	panel = Color3.fromRGB(46, 128, 224),
+	panelLight = Color3.fromRGB(32, 98, 190),
+	card = Color3.fromRGB(26, 80, 160),
+	header = Color3.fromRGB(255, 176, 36),
+	headerEdge = Color3.fromRGB(205, 112, 8),
+	outline = Color3.fromRGB(12, 28, 64),
 	text = Color3.fromRGB(255, 255, 255),
-	textDim = Color3.fromRGB(190, 195, 220),
-	accent = Color3.fromRGB(255, 120, 200),
-	good = Color3.fromRGB(90, 210, 110),
-	warn = Color3.fromRGB(255, 190, 60),
-	bad = Color3.fromRGB(235, 80, 80),
-	info = Color3.fromRGB(90, 160, 255),
+	textDim = Color3.fromRGB(214, 232, 255),
+	accent = Color3.fromRGB(255, 110, 200),
+	good = Color3.fromRGB(70, 214, 100),
+	warn = Color3.fromRGB(255, 200, 50),
+	bad = Color3.fromRGB(240, 70, 85),
+	info = Color3.fromRGB(70, 160, 255),
 	coins = Color3.fromRGB(255, 210, 70),
 	essence = Color3.fromRGB(255, 120, 200),
 	disabled = Color3.fromRGB(100, 104, 125),
@@ -30,9 +33,9 @@ Theme.colors = {
 
 Theme.textSize = {
 	small = 14,
-	body = 18,
-	title = 26,
-	huge = 40,
+	body = 19,
+	title = 30,
+	huge = 46,
 }
 
 -- Minimum touch target (design px). ~44pt on a typical phone after scaling.

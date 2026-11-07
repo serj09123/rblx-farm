@@ -13,6 +13,7 @@ local Progression = require(Shared.logic.Progression)
 
 local ReceiptLogic = require(script.Parent.Parent.data.ReceiptLogic)
 local Analytics = require(script.Parent.Analytics)
+local CaseService = require(script.Parent.CaseService)
 local DataService = require(script.Parent.DataService)
 local EconomyService = require(script.Parent.EconomyService)
 local FarmService = require(script.Parent.FarmService)
@@ -69,6 +70,12 @@ local function grant(player: Player, def: Monetization.ProductDef)
 		FarmService:finishAll(player)
 	elseif def.key == "ServerBloom" then
 		SkyheartService:triggerPurchasedBloom(player)
+	elseif def.caseKeys then
+		for tierId, count in def.caseKeys do
+			if not CaseService:addKeys(player, tierId, count) then
+				error("Could not grant case keys for " .. def.key)
+			end
+		end
 	elseif def.coins then
 		EconomyService:add(player, packCoins(player, def), "product_" .. def.key, "IAP")
 	else

@@ -34,6 +34,9 @@ local definitions: { [string]: RemoteDef } = {
 	SellCreatures = { kind = "event", direction = "c2s", args = { Guard.uniqueArray(creatureId, 50) }, rate = { 4, 1 } },
 	SetLocked = { kind = "event", direction = "c2s", args = { creatureId, Guard.boolean }, rate = { 10, 5 } },
 	DonateCreature = { kind = "event", direction = "c2s", args = { creatureId }, rate = { 5, 2 } },
+	-- Cases
+	BuyCaseKey = { kind = "event", direction = "c2s", args = { id, Guard.integer(1, 10) }, rate = { 4, 2 } },
+	ApplyMutagen = { kind = "event", direction = "c2s", args = { slotNest, id }, rate = { 6, 3 } },
 	-- Co-op
 	CheerNest = { kind = "event", direction = "c2s", args = { userId, slotNest }, rate = { 5, 2 } },
 	-- Retention
@@ -86,6 +89,8 @@ local definitions: { [string]: RemoteDef } = {
 	-- Requests with replies
 	GetOdds = { kind = "function", direction = "c2s", args = { id }, rate = { 10, 2 } },
 	GetLeaderboards = { kind = "function", direction = "c2s", args = {}, rate = { 3, 0.2 } },
+	OpenCase = { kind = "function", direction = "c2s", args = { id }, rate = { 3, 0.5 } },
+	GetCaseOdds = { kind = "function", direction = "c2s", args = { id }, rate = { 10, 2 } },
 	GetShop = { kind = "function", direction = "c2s", args = {}, rate = { 4, 0.5 } },
 
 	-- Server -> client

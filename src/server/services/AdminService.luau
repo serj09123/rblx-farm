@@ -3,6 +3,7 @@
 --   /inspect <name>          summary of a player's profile
 --   /trade <tradeId>         summary of a committed trade record
 --   /grant <name> <coins>    compensation (capped, audit-logged)
+--   /showcase                toggles a display of every critter species in front of you
 -- Non-admins get no response at all, so the commands are not discoverable.
 
 local Players = game:GetService("Players")
@@ -15,6 +16,7 @@ local DataService = require(script.Parent.DataService)
 local EconomyService = require(script.Parent.EconomyService)
 local TradeService = require(script.Parent.TradeService)
 local Notifier = require(script.Parent.Parent.Notifier)
+local Showcase = require(script.Parent.Parent.Showcase)
 
 local AdminService = {}
 
@@ -123,6 +125,7 @@ local COMMANDS: { [string]: (Player, { string }) -> () } = {
 	["/inspect"] = inspect,
 	["/trade"] = trade,
 	["/grant"] = grant,
+	["/showcase"] = Showcase.toggle,
 }
 
 function AdminService:Start()

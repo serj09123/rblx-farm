@@ -297,6 +297,11 @@ local loader = Loader.new({
 				return { Time = time, Value = value }
 			end,
 		},
+		ColorSequenceKeypoint = roblox.ColorSequenceKeypoint or {
+			new = function(time, value)
+				return { Time = time, Value = value }
+			end,
+		},
 		TweenInfo = {
 			new = function(...)
 				return { ... }
@@ -414,6 +419,17 @@ Net.Client.invoke = function(name, arg)
 			luckBoostPreview = { luck = 2.4, rarities = rarities },
 			disclaimer = Odds.roundingDisclaimer,
 		}
+	elseif name == "GetCaseOdds" then
+		local Cases = require(Shared.config.Cases)
+		local CaseRoller = require(Shared.logic.CaseRoller)
+		local odds = CaseRoller.odds(Cases.byId[arg], 3)
+		return {
+			ok = true,
+			tier = arg,
+			entries = odds.entries,
+			grades = odds.grades,
+			pity = { minGrade = "Rare", threshold = 10, active = odds.pityActive, remaining = odds.opensUntilPity },
+		}
 	elseif name == "GetShop" then
 		local passes, products = {}, {}
 		for _, p in Monetization.passes do
@@ -453,6 +469,7 @@ local ORDER = {
 	"AtmosphereController",
 	"FarmController",
 	"ShopController",
+	"CaseController",
 	"InventoryController",
 	"IndexController",
 	"QuestController",
@@ -523,6 +540,8 @@ check("full Sync payload applies", function()
 		state = {
 			coins = 12345,
 			inventoryNests = { starter = 1, meadow = 3, skyheart = 1 },
+			mutagens = { Shiny = 2, Golden = 1 },
+			cases = { keys = { sprout = 2, moon = 0, star = 1 }, pity = { sprout = 3, moon = 0, star = 0 }, opened = 5 },
 			nests = { ["1"] = { nestId = "meadow", progress = 10, required = 30, lastUpdate = now, cheers = {} } },
 			habitats = { ["1"] = firstId },
 			upgrades = { nestSlots = 1, habitatSlots = 0, growthSpeed = 2, luck = 5, backpack = 0 },
@@ -591,6 +610,10 @@ local panels = {
 	{ "Odds", "crystal" },
 	{ "Odds", "starter" },
 	{ "Odds", "grove", true },
+	{ "Cases" },
+	{ "Cases", "Shiny" },
+	{ "CaseOdds", "sprout" },
+	{ "CaseOdds", "star" },
 	{ "Upgrades" },
 	{ "Store" },
 	{ "Index" },

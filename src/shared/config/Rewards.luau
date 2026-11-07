@@ -4,6 +4,7 @@
 export type Reward = {
 	coins: number?,
 	nests: { [string]: number }?,
+	keys: { [string]: number }?, -- case tier id -> keys
 	growthBoostSeconds: number?,
 	scaleWithTier: boolean?, -- multiply coins by tierCoinScale[playerTier]
 }

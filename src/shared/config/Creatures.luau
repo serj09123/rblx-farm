@@ -11,7 +11,9 @@ export type SpeciesDef = {
 	color: { number },
 	accent: { number },
 	shape: Shape,
-	scale: number, -- placeholder body scale (studs)
+	scale: number, -- body scale (studs; the largest dimension of a mesh model)
+	modelAssetId: string?, -- uploaded Model asset (single MeshPart); nil = primitive placeholder
+	modelYawDeg: number?, -- extra yaw so the model faces -Z (AI meshes come in either way round)
 	weight: number?, -- relative weight inside its rarity (default 1)
 	eventOnly: string?, -- season id; only rollable while that season is active
 }
@@ -29,6 +31,7 @@ Creatures.list = {
 		accent = { 255, 182, 193 },
 		shape = "Ball",
 		scale = 2,
+		modelAssetId = "119213723369374",
 	},
 	{
 		id = "mossnib",
@@ -39,6 +42,7 @@ Creatures.list = {
 		accent = { 60, 90, 40 },
 		shape = "Block",
 		scale = 1.6,
+		modelAssetId = "112118584646700",
 	},
 	{
 		id = "bubbloo",
@@ -49,6 +53,7 @@ Creatures.list = {
 		accent = { 255, 255, 255 },
 		shape = "Ball",
 		scale = 1.8,
+		modelAssetId = "122436561192092",
 	},
 	{
 		id = "pebblit",
@@ -59,6 +64,8 @@ Creatures.list = {
 		accent = { 90, 80, 70 },
 		shape = "Block",
 		scale = 1.5,
+		modelAssetId = "126709549357004",
+		modelYawDeg = 180,
 	},
 	{
 		id = "dandeleap",
@@ -69,6 +76,7 @@ Creatures.list = {
 		accent = { 255, 255, 255 },
 		shape = "Ball",
 		scale = 1.7,
+		modelAssetId = "128814511014545",
 	},
 	{
 		id = "snoozel",
@@ -79,6 +87,7 @@ Creatures.list = {
 		accent = { 120, 90, 60 },
 		shape = "Cylinder",
 		scale = 1.6,
+		modelAssetId = "123409495834846",
 	},
 	-- Uncommon
 	{
@@ -90,6 +99,7 @@ Creatures.list = {
 		accent = { 180, 140, 255 },
 		shape = "Ball",
 		scale = 1.8,
+		modelAssetId = "85946982412752",
 	},
 	{
 		id = "thornback",
@@ -100,6 +110,7 @@ Creatures.list = {
 		accent = { 60, 140, 60 },
 		shape = "Ball",
 		scale = 2,
+		modelAssetId = "82067444863553",
 	},
 	{
 		id = "splashfin",
@@ -110,6 +121,7 @@ Creatures.list = {
 		accent = { 80, 160, 255 },
 		shape = "Cylinder",
 		scale = 1.9,
+		modelAssetId = "90506487019387",
 	},
 	{
 		id = "cindertail",
@@ -120,6 +132,7 @@ Creatures.list = {
 		accent = { 255, 220, 120 },
 		shape = "Block",
 		scale = 1.9,
+		modelAssetId = "118558545804799",
 	},
 	{
 		id = "breezeling",
@@ -130,6 +143,7 @@ Creatures.list = {
 		accent = { 120, 180, 220 },
 		shape = "Ball",
 		scale = 1.6,
+		modelAssetId = "73450914852919",
 	},
 	-- Rare
 	{
@@ -141,6 +155,7 @@ Creatures.list = {
 		accent = { 90, 180, 255 },
 		shape = "Cylinder",
 		scale = 2.2,
+		modelAssetId = "120583455139922",
 	},
 	{
 		id = "voltkit",
@@ -151,6 +166,7 @@ Creatures.list = {
 		accent = { 40, 40, 60 },
 		shape = "Block",
 		scale = 2.1,
+		modelAssetId = "75151616839142",
 	},
 	{
 		id = "lumashroom",
@@ -161,6 +177,7 @@ Creatures.list = {
 		accent = { 255, 90, 160 },
 		shape = "Cylinder",
 		scale = 2.3,
+		modelAssetId = "97637986557797",
 	},
 	{
 		id = "coralyn",
@@ -171,6 +188,7 @@ Creatures.list = {
 		accent = { 255, 210, 160 },
 		shape = "Ball",
 		scale = 2.1,
+		modelAssetId = "131346540269347",
 	},
 	{
 		id = "duskowl",
@@ -181,6 +199,7 @@ Creatures.list = {
 		accent = { 255, 210, 80 },
 		shape = "Ball",
 		scale = 2.2,
+		modelAssetId = "102036535968616",
 	},
 	-- Epic
 	{
@@ -192,6 +211,7 @@ Creatures.list = {
 		accent = { 255, 255, 255 },
 		shape = "Block",
 		scale = 2.8,
+		modelAssetId = "72372563156354",
 	},
 	{
 		id = "stormwing",
@@ -202,6 +222,7 @@ Creatures.list = {
 		accent = { 255, 255, 120 },
 		shape = "Ball",
 		scale = 2.7,
+		modelAssetId = "133908521965187",
 	},
 	{
 		id = "emberdrake",
@@ -212,6 +233,8 @@ Creatures.list = {
 		accent = { 255, 200, 60 },
 		shape = "Cylinder",
 		scale = 2.9,
+		modelAssetId = "72942928488308",
+		modelYawDeg = 180,
 	},
 	{
 		id = "tidalpup",
@@ -222,6 +245,7 @@ Creatures.list = {
 		accent = { 240, 250, 255 },
 		shape = "Ball",
 		scale = 2.6,
+		modelAssetId = "87525167187445",
 	},
 	-- Legendary
 	{
@@ -233,6 +257,7 @@ Creatures.list = {
 		accent = { 200, 120, 255 },
 		shape = "Ball",
 		scale = 3.2,
+		modelAssetId = "89571598757883",
 	},
 	{
 		id = "solmane",
@@ -243,6 +268,7 @@ Creatures.list = {
 		accent = { 255, 120, 30 },
 		shape = "Block",
 		scale = 3.4,
+		modelAssetId = "74267053244981",
 	},
 	{
 		id = "gloomwyrm",
@@ -253,6 +279,7 @@ Creatures.list = {
 		accent = { 160, 255, 90 },
 		shape = "Cylinder",
 		scale = 3.5,
+		modelAssetId = "107353716448782",
 	},
 	-- Mythic
 	{
@@ -264,6 +291,7 @@ Creatures.list = {
 		accent = { 120, 180, 255 },
 		shape = "Ball",
 		scale = 4.2,
+		modelAssetId = "119090356524252",
 	},
 	{
 		id = "starweaver",
@@ -274,6 +302,7 @@ Creatures.list = {
 		accent = { 255, 240, 150 },
 		shape = "Ball",
 		scale = 3.8,
+		modelAssetId = "126738782753710",
 	},
 	-- Seasonal (only rollable while their season is active)
 	{
@@ -285,6 +314,7 @@ Creatures.list = {
 		accent = { 70, 140, 40 },
 		shape = "Ball",
 		scale = 2.7,
+		modelAssetId = "134358306209237",
 		eventOnly = "harvest_festival_2026",
 	},
 	{
@@ -296,6 +326,7 @@ Creatures.list = {
 		accent = { 120, 200, 255 },
 		shape = "Block",
 		scale = 3.3,
+		modelAssetId = "98814727059423",
 		eventOnly = "winter_frost_2026",
 	},
 } :: { SpeciesDef }
